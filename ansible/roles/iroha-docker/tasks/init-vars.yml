@@ -18,8 +18,8 @@
   - name: generate hostnames (iroha_custom_hostnames)
     set_fact:
       iroha_nodes: "{{ iroha_nodes }} + [ '{% if item.split(':') | length < 2 %}{{ item }}:{{ iroha_peer_port | int + idx }}{% else %}{{ item }}{% endif %}' ]"
-    when: iroha_custom_hostnames and hostnames is defined
-    loop: "{{ hostnames }}"
+    when: iroha_custom_hostnames and iroha_hostnames is defined
+    loop: "{{ iroha_hostnames }}"
     loop_control:
       index_var: idx
 
