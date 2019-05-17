@@ -6,7 +6,7 @@ iroha_replicas: 4
 
 # Whether to use custom hostname for EACH container.
 # If set to `true`, Iroha peers will communicate using these hostnames. Hostnames should be set using
-# `hostnames` variable. See example playbook in `playbooks/iroha-docker/main.yml`.
+# `iroha_hostnames` variable. See example playbook in `playbooks/iroha-docker/main.yml`.
 # If set to `false`, Iroha peers will communicate by IP addresses set by `inventory_hostname`
 # variable. Container and service names in Docker Compose files will be auto-generated.
 #
@@ -39,7 +39,7 @@ iroha_network_gateway: '10.10.111.1'
 
 # The role is incompatible with Iroha versions below RC2 since keys format has changed.
 # Apply the patch (files/old-keys-format.patch) if you need support for previous Iroha versions.
-iroha_docker_tag: 1.0.0_rc5
+iroha_docker_tag: '1.0.0'
 iroha_postgres_docker_tag: '9.5'
 
 ## The block of variables that toggles certain tasks of the role
