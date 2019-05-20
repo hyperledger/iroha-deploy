@@ -27,6 +27,14 @@ services:
     networks:
       - {{ iroha_network_name }}
       - iroha-db-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: {{ iroha_docker_logging_max_size }}
+        max-file: {{ iroha_docker_logging_max_file }}
+{% if iroha_docker_mem_limit %}
+    mem_limit: {{ iroha_docker_mem_limit }}
+{% endif %}
     restart: always
 
   {{ node.human_hostname }}-postgres:
