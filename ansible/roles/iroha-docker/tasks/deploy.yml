@@ -35,3 +35,4 @@
       project_src: "{{ iroha_deploy_dir }}"
     tags: ["iroha-deploy"]
   when: iroha_update_runtime_configs
+  tags: ["iroha-docker"]
