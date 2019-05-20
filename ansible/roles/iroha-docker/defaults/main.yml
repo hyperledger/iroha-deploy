@@ -91,3 +91,12 @@ iroha_blockstore_path: /tmp/block_store
 #iroha_max_rounds_delay: 3000
 #iroha_stale_stream_max_rounds: 2
 
+## Iroha logging
+# Maximum docker log file size
+iroha_docker_logging_max_size: '100m'
+# The amount of individual docker log files
+iroha_docker_logging_max_file: 3
+
+## Iroha RAM limit
+# Maximum amount of RAM, it only limits the docker container (e.g. '1024m')
+iroha_docker_mem_limit: ''
