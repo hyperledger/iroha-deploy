@@ -7,13 +7,13 @@
   # Attachable overlay network cannot be created with a `docker_network` module
   - name: create Docker network
     shell: "docker network create -d overlay --attachable {{ iroha_network_name }} --gateway {{ iroha_network_gateway }} --subnet {{ iroha_network_address }} || true"
-    when: iroha_overlay_network
+    when: iroha_overlay_network and (ansible_play_batch | length > 1)
     run_once: yes
 
   - name: create Docker network
     docker_network:
       name: "{{ iroha_network_name }}"
-    when: not iroha_overlay_network
+    when: not iroha_overlay_network or (ansible_play_batch | length == 1)
 
   - name: generate Docker Compose
     template:
