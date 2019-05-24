@@ -45,13 +45,13 @@
   become: no
   delegate_to: localhost
   when: iroha_generate_init_configs
-  tags: ["iroha-config-gen"]
+  tags: ["iroha-docker", "iroha-config-gen"]
 
 - name: create deploy dir
   file:
     state: directory
     path: "{{ iroha_deploy_dir }}/conf"
-  tags: ["iroha-config-gen"]
+  tags: ["iroha-docker", "iroha-config-gen"]
 
 - name: copy config files
   synchronize:
@@ -60,4 +60,4 @@
     recursive: yes
     checksum: yes
   when: iroha_generate_init_configs
-  tags: ["iroha-config-gen"]
+  tags: ["iroha-docker", "iroha-config-gen"]
