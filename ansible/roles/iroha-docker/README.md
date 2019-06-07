@@ -14,8 +14,8 @@ This method is also suitable for local-only deployments and does not require any
 # Requirements
   Tested on Ubuntu 16.04, 18.04
   - Local:
-    - python3, python3-dev
-    - PIP modules: ansible(>=2.4), future, sha3(for Python<3.6)
+    - python3
+    - ansible(>=2.4)
   - Remote:
     - Docker (>=17.12)
     - python3

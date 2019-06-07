@@ -1,0 +1,9 @@
+FROM python:3-stretch
+
+WORKDIR /opt/app
+
+RUN pip3 install iroha==0.0.5.4 ansible==2.8.3
+
+COPY iroha_utils.py iroha_utils.py
+
+ENTRYPOINT ["python3", "iroha_utils.py" ]

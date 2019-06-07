@@ -1,0 +1,137 @@
+- name: Create local vars dir
+  file:
+    state: directory
+    path: "{{ iroha_peer_keys_file | dirname }}"
+  run_once: yes
+
+- name: Check 'iroha_peer_keys.yml' file
+  stat:
+    path: "{{ iroha_peer_keys_file }}"
+  run_once: yes
+  register: iroha_check_iroha_peer_keys_register
+
+- name: Read 'iroha_peer_keys.yml' file
+  include_vars:
+    file: "{{ iroha_peer_keys_file }}"
+    name: iroha_peer_keys_from_file
+  when: iroha_check_iroha_peer_keys_register.stat.exists
+
+- name: Print variables from 'iroha_peer_keys.yml' file
+  debug:
+   var: iroha_peer_keys_from_file
+  when: iroha_peer_keys_from_file is defined
+  run_once: yes
+
+- name: Set init value for 'iroha_new_peer_keys', 'iroha_new_peer_keys_encrypt' and 'iroha_invalid_peer_list' variables
+  set_fact:
+    iroha_new_peer_keys: "{{ iroha_peer_keys_from_file[inventory_hostname] | default({}) }}"
+    iroha_new_peer_keys_encrypt: {}
+    iroha_invalid_peer_list: []
+
+- name: Set 'iroha_invalid_peer_list' variable 1
+  set_fact:
+    iroha_invalid_peer_list: "{{ iroha_nodes | difference(iroha_peer_keys_from_file[inventory_hostname].keys()) | default([]) }}"
+  when: iroha_peer_keys_from_file is defined
+
+- name: Set 'iroha_invalid_peer_list' variable 2
+  set_fact:
+    iroha_invalid_peer_list: "{{ iroha_nodes }}"
+  when: iroha_peer_keys_from_file is not defined
+
+- debug:
+    var: iroha_invalid_peer_list
+
+- name: Set iroha_invalid_peer variable
+  set_fact:
+    iroha_invalid_peer: "{{ (hostvars | json_query('*.iroha_invalid_peer_list') | flatten | length) != 0 }}"
+  run_once: yes
+
+- name: Validation peer keys
+  set_fact:
+    iroha_invalid_peer_keys: "{{ iroha_invalid_peer_keys | default([]) + [item] }}"
+  loop: "{{ iroha_peer_keys_from_file | default({}) | json_query('*.*.*') | flatten }}"
+  when: (item | length ) != 64 or ( item | regex_search('([^0-9a-f]+)') )
+  run_once: yes
+
+- name: There are invalid peer keys
+  fail:
+    msg: "{{ iroha_invalid_peer_keys }}"
+  when: iroha_invalid_peer_keys is defined
+
+- name: Read ansible vault key
+  set_fact:
+    iroha_ansible_vault_key: "{{ lookup('file', iroha_peer_keys_ansible_encrypt_password_file) | regex_replace('(\n)', '') }}"
+  when: iroha_peer_keys_ansible_encrypt_enable and iroha_peer_keys_ansible_encrypt_password_file
+  run_once: yes
+
+- debug:
+    var: iroha_ansible_vault_key
+  when: iroha_ansible_vault_key is defined
+  run_once: yes
+
+- name: Generate peer keys
+  docker_container:
+    name: "iroha_command_for_{{ ansible_host }}"
+    image: "iroha-docker-iroha-python"
+    recreate: yes
+    detach: no
+    cleanup: yes
+    command:
+      - "gen_keys {{ iroha_invalid_peer_list | length }}"
+  when: iroha_invalid_peer_list
+  register: iroha_command_register
+  delegate_to: "{{ iroha_command_host }}"
+  become: yes
+
+- name: Attach new peer keys
+  set_fact:
+    iroha_new_peer_keys: "{{ iroha_new_peer_keys | combine({item: (iroha_command_register.ansible_facts.docker_container.Output | from_json)['result'][ansible_loop.index0]}, recursive=True) }}"
+  loop: "{{ iroha_invalid_peer_list }}"
+  loop_control:
+     extended: yes
+
+- block:
+
+  - name: Encrypt peer keys
+    docker_container:
+      name: "iroha_command_for_{{ ansible_host }}"
+      image: "iroha-docker-iroha-python"
+      recreate: yes
+      detach: no
+      cleanup: yes
+      command:
+        - "ansible_vault_encrypt {{ iroha_ansible_vault_key }} {{ item.value.priv }}"
+    loop: "{{ iroha_new_peer_keys | dict2items }}"
+    when: iroha_ansible_vault_key is defined
+    delegate_to: "{{ iroha_command_host }}"
+    register: iroha_command_register
+    become: yes
+
+  - name: Attach encrypt peer keys
+    set_fact:
+      iroha_new_peer_keys_encrypt: "{{ (iroha_new_peer_keys_encrypt | default({})) | combine({item.item.key: {'pub': item.item.value.pub, 'priv': '!vault |' + '\n' + (item.ansible_facts.docker_container.Output | from_json)['result'] }}) }}"
+    loop: "{{ iroha_command_register.results}}"
+    when: iroha_ansible_vault_key is defined
+
+  - name: Set 'iroha_peer_keys_to_file' variable 1
+    set_fact:
+      iroha_peer_keys_to_file: "{{ (iroha_peer_keys_to_file | default({})) | combine({item: hostvars[item]['iroha_new_peer_keys_encrypt']}, recursive=True) }}"
+    loop: "{{ ansible_play_hosts }}"
+    when: iroha_ansible_vault_key is defined
+    run_once: yes
+
+  - name: Set 'iroha_peer_keys_to_file' variable 2
+    set_fact:
+      iroha_peer_keys_to_file: "{{ (iroha_peer_keys_to_file | default({})) | combine({item: hostvars[item]['iroha_new_peer_keys']}, recursive=True) }}"
+    loop: "{{ ansible_play_hosts }}"
+    when: iroha_ansible_vault_key is not defined
+    run_once: yes
+
+  - name: Write 'iroha_peer_keys.yml' file
+    copy:
+      content: |-
+        {{ iroha_peer_keys_to_file | to_nice_yaml(indent=2) | regex_replace("(')", "") | regex_replace("(\n\s*\n)", "\n") }}
+      dest: "{{ iroha_peer_keys_file }}"
+    run_once: yes
+
+  when: iroha_invalid_peer

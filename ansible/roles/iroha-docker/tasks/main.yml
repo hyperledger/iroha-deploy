@@ -1,3 +1,6 @@
+- name: iroha util
+  include: iroha-util.yml
+
 - name: init vars
   include: init-vars.yml
 
@@ -7,7 +10,3 @@
 - name: deploy Iroha
   include: deploy.yml
 
-- debug:
-    msg: "Stop Iroha containers with `docker-compose -f {{ iroha_deploy_dir }}/docker-compose.yml down`"
-  when: iroha_update_runtime_configs
-  run_once: yes
