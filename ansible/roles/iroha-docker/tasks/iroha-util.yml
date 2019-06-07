@@ -1,0 +1,45 @@
+- block:
+
+  - name: Set iroha_command_host variable
+    set_fact:
+      iroha_command_host: "{{ item.key }}"
+    when: item.value.iroha_service_host is defined and item.value.iroha_service_host
+    loop: "{{hostvars | dict2items }}"
+    delegate_to: localhost
+    run_once: yes
+    become: no
+
+  - name: Create deploy dir
+    file:
+      state: directory
+      path: "{{ iroha_deploy_dir }}/conf"
+    tags: ["iroha-docker", "iroha-util"]
+
+  - name: Copy iroha-python util
+    copy:
+      src: "iroha_utils.py"
+      dest: "{{ iroha_deploy_dir }}/iroha_utils.py"
+    tags: ["iroha-docker", "iroha-util"]
+    delegate_to: "{{ iroha_command_host }}"
+    run_once: yes
+
+  - name: Copy iroha-python util Dockerfile
+    copy:
+      src: "Dockerfile_iroha_python"
+      dest: "{{ iroha_deploy_dir }}/Dockerfile_iroha_python"
+    tags: ["iroha-docker", "iroha-util"]
+    delegate_to: "{{ iroha_command_host }}"
+    run_once: yes
+
+  - name: Build docker image for iroha-python util
+    docker_image:
+      name: "iroha-docker-iroha-python"
+      build:
+        path: "{{ iroha_deploy_dir }}"
+        dockerfile: "Dockerfile_iroha_python"
+      source: build
+      force_source: yes
+    delegate_to: "{{ iroha_command_host }}"
+    run_once: yes
+
+  tags: ["iroha-docker", "iroha-util"]

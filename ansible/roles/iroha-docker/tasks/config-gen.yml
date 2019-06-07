@@ -1,63 +1,87 @@
 - block:
-  - name: copy custom genesis block
-    copy:
-      src: "{{ iroha_custom_genesis_block_path }}"
-      dest: "{{ role_path }}/files/genesis.block"
-    run_once: yes
-    when: iroha_custom_genesis_block
-    failed_when: iroha_custom_genesis_block_path is not defined
 
-  - name: generate Iroha configs
-    command: "./config_gen.sh -p{{ iroha_all_nodes | join(',', attribute='hostname') }} -o{{ iroha_config_local_dir }} -f"
-    run_once: yes
-    args:
-      chdir: "{{ role_path }}/files"
-
-  - name: make config dirs
+  - name: Create deploy dir
     file:
-      path: "{{ iroha_config_local_dir }}/{{ inventory_hostname }}/conf/{{ item.human_hostname }}"
       state: directory
-    loop: "{{ iroha_nodes }}"
+      path: "{{ iroha_deploy_dir }}/conf/{{ item.human_hostname }}"
+    loop: "{{ iroha_new_nodes }}"
 
-  - name: move keys
-    copy:
-      src: "{{ iroha_config_local_dir }}/{{ item[0].hostname }}{{ item[1] }}"
-      dest: "{{ iroha_config_local_dir }}/{{ inventory_hostname }}/conf/{{ item[0].human_hostname }}"
-    loop: "{{ iroha_nodes | product(['.priv', '.pub']) | list }}"
+  - block:
 
-  - name: move genesis.block
-    copy:
-      src: "{{ iroha_config_local_dir }}/genesis.block"
-      dest: "{{ iroha_config_local_dir }}/{{ inventory_hostname }}/conf/{{ item.human_hostname }}"
-    loop: "{{ iroha_nodes }}"
+      - name: Get existing genesis block 1
+        docker_container:
+          name: "iroha_command"
+          image: "iroha-docker-iroha-python"
+          recreate: yes
+          detach: no
+          cleanup: yes
+          networks:
+            - name: "{{iroha_network_name}}"
+          command:
+            - "get_genesis_block"
+          env:
+            IROHA_HOSTS: "{% for iroha_node in hostvars[iroha_command_host]['iroha_old_nodes'] %}{{ iroha_node.human_hostname }}:{{ iroha_torii_port }}{% if not loop.last %},{% endif %}{% endfor %}"
+            IROHA_ACCOUNT: "{{ hostvars[iroha_command_host]['iroha_service_account']  }}"
+            IROHA_ACCOUNT_KEYS: "{{ hostvars[iroha_command_host]['iroha_service_account_keys'] | join(',') }}"
+        register: iroha_command_register
 
-  - name: cleanup
-    file:
-      path: "{{ iroha_config_local_dir }}/{{ item[0].hostname }}{{ item[1] }}"
-      state: absent
-    loop: "{{ iroha_nodes | product(['.priv', '.pub']) | list }}"
+      - name: Get existing genesis block 2
+        set_fact:
+          iroha_new_genesis_block: "{{ (iroha_command_register.ansible_facts.docker_container.Output | from_json).result }}"
 
-  - name: cleanup
-    file:
-      path: "{{ iroha_config_local_dir }}/genesis.block"
-      state: absent
+    delegate_to: "{{ iroha_command_host }}"
     run_once: yes
-  become: no
-  delegate_to: localhost
-  when: iroha_generate_init_configs
-  tags: ["iroha-docker", "iroha-config-gen"]
+    when: node_change
 
-- name: create deploy dir
-  file:
-    state: directory
-    path: "{{ iroha_deploy_dir }}/conf"
-  tags: ["iroha-docker", "iroha-config-gen"]
+  - block:
 
-- name: copy config files
-  synchronize:
-    src: "{{ iroha_config_local_dir }}/{{ inventory_hostname }}/conf/"
-    dest: "{{ iroha_deploy_dir }}/conf/"
-    recursive: yes
-    checksum: yes
-  when: iroha_generate_init_configs
+      - name: Generate genesis.block 1
+        set_fact:
+          iroha_new_genesis_block: "{{ iroha_genesis_block | from_json }}"
+
+      - name: Generate genesis.block 2
+        set_fact:
+          iroha_genesis_block_commands: "{{ (iroha_genesis_block_commands | default([])) + [item] }}"
+        loop: "{{ iroha_new_genesis_block['block_v1']['payload']['transactions'][0]['payload']['reducedPayload']['commands'] }}"
+        when: "{{ 'addPeer' not in item }}"
+
+      - name: Generate genesis.block 3
+        set_fact:
+          iroha_genesis_block_commands: "{{ iroha_genesis_block_commands + [{'addPeer': {'peer': {'address': item.hostname, 'peerKey': item.pub_key}}}] }}"
+        loop: "{{ iroha_all_new_nodes }}"
+
+      - name: Generate genesis.block 4
+        set_fact:
+          iroha_new_genesis_block: "{{ iroha_new_genesis_block | combine({'block_v1': {'payload': {'transactions': [{'payload': {'reducedPayload': {'commands': iroha_genesis_block_commands}}}]}}}, recursive=True) }}"
+
+    delegate_to: localhost
+    run_once: yes
+    become: no
+    when: not node_change and iroha_all_new_nodes
+
+  - name: Debug
+    debug:
+      var: iroha_new_genesis_block
+    run_once: yes
+    become: no
+    delegate_to: localhost
+
+  - name: Move genesis.block
+    copy:
+      content: "{{ iroha_new_genesis_block | to_nice_json(indent=2) }}"
+      dest: "{{ iroha_deploy_dir }}/conf/{{ item.human_hostname }}/genesis.block"
+    loop: "{{ iroha_new_nodes }}"
+
+  - name: Move pub peer keys
+    copy:
+      content: "{{ iroha_new_peer_keys[item.hostname]['pub'] }}"
+      dest: "{{ iroha_deploy_dir }}/conf/{{ item.human_hostname }}/{{ item.hostname }}.pub"
+    loop: "{{ iroha_new_nodes }}"
+
+  - name: Move priv peer keys
+    copy:
+      content: "{{ iroha_new_peer_keys[item.hostname]['priv'] }}"
+      dest: "{{ iroha_deploy_dir }}/conf/{{ item.human_hostname }}/{{ item.hostname }}.priv"
+    loop: "{{ iroha_new_nodes }}"
+
   tags: ["iroha-docker", "iroha-config-gen"]

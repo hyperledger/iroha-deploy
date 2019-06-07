@@ -1,4 +1,12 @@
 {
+{% if iroha_log_debug %}
+  "log": {
+      "level": "debug",
+      "patterns": {
+        "trace": "[%Y-%m-%d %H:%M:%S.%F][th:%t][%l] %n %v"
+      }
+  },
+{% endif %}
   "block_store_path" : "{{ iroha_blockstore_path }}",
   "torii_port" : {{ iroha_torii_port }},
   "internal_port" : {{ iroha_peer_port }},
