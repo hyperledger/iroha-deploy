@@ -3,13 +3,14 @@ version: "2.4"
 services:
 {% for node in iroha_nodes %}
   {{ node.human_hostname }}:
-    image: hyperledger/iroha:{{ iroha_docker_tag }}
+#    image: hyperledger/iroha:{{ iroha_docker_tag }}
+    image: soramitsu/iroha:1.0.1-vote-log
 {% if iroha_overlay_network %}
     container_name: {{ node.hostname.split(':')[0] }}
     expose:
       - {{ iroha_peer_port }}
     ports:
-        - {{ iroha_torii_port | int + loop.index - 1 }}:{{ iroha_torii_port }}
+      - {{ iroha_torii_port | int + loop.index - 1 }}:{{ iroha_torii_port }}
 {% else %}
     container_name: {{ node.human_hostname }}
     ports:
@@ -17,8 +18,17 @@ services:
       - {{ iroha_torii_port | int + loop.index - 1 }}:{{ iroha_torii_port }}
 {% endif %}
     environment:
-      KEY: {{ node.hostname }}
-      IROHA_POSTGRES_HOST: {{ iroha_inventory_human_hostname }}-postgres
+      - "KEY={{ node.hostname }}"
+      - "IROHA_POSTGRES_HOST={{ iroha_inventory_human_hostname }}-postgres"
+{% for env_variable in iroha_docker_env_variables.items() %}
+      - "{{ env_variable[0] }}={{ env_variable[1] }}"
+{% endfor %}
+{% if iroha_docker_labels %}
+    labels:
+{% for label in iroha_docker_labels.items() %}
+      - "{{ label[0] }}={{ label[1] }}"
+{% endfor %}
+{% endif %}
     volumes:
       - iroha_block_store-{{ node.human_hostname }}:/tmp/block_store
       - ./conf/{{ node.human_hostname }}:/opt/iroha_data

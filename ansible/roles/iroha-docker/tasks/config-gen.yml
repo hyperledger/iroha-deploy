@@ -1,3 +1,86 @@
+- name: Check iroha
+  stat:
+    path: "{{ iroha_deploy_dir }}/conf/{{ item.human_hostname }}/genesis.block"
+  loop: "{{ iroha_nodes }}"
+  register: check_iroha_register
+  tags: ["iroha-docker", "iroha-config-gen"]
+
+- block:
+  - name: set empty iroha_new_nodes variable
+    set_fact:
+      iroha_new_nodes: []
+
+  - name: set iroha_new_nodes variable
+    set_fact:
+      iroha_new_nodes: "{{ iroha_new_nodes + [item.item] }}"
+    loop: "{{ check_iroha_register.results }}"
+    when: not item.stat.exists
+
+  - name: set iroha_all_new_nodes variable
+    set_fact:
+      iroha_all_new_nodes: "{{ (iroha_all_new_nodes | default([])) + hostvars[item]['iroha_new_nodes'] }}"
+    loop: "{{ ansible_play_hosts }}"
+    run_once: yes
+
+  - name: set iroha_old_nodes variable
+    set_fact:
+      iroha_old_nodes: "{{ iroha_nodes | difference(iroha_new_nodes) }}"
+
+  - name: set node_change variable
+    set_fact:
+      node_change: true
+    when: iroha_all_new_nodes and (( iroha_all_new_nodes | length ) < ( iroha_all_nodes | length ))
+    run_once: yes
+
+  - name: set node_change variable
+    set_fact:
+      node_change: false
+    when: node_change is not defined
+    run_once: yes
+
+  - name: set iroha_command_host variable
+    set_fact:
+      iroha_command_host: "{{ item.key }}"
+    when: node_change and item.value.iroha_service_host is defined and item.value.iroha_service_host
+    loop: "{{hostvars | dict2items }}"
+    run_once: yes
+
+  become: no
+  delegate_to: localhost
+  tags: ["iroha-docker", "iroha-config-gen"]
+
+- block:
+  - name: Copy iroha util
+    copy:
+      src: "iroha_utils.py"
+      dest: "{{ iroha_deploy_dir }}/iroha_utils.py"
+
+  - name: Get genesis block
+    docker_container:
+      name: "iroha_command"
+      image: "python:stretch"
+      recreate: yes
+      detach: no
+      cleanup: yes
+      networks:
+        - name: "{{iroha_network_name}}"
+      entrypoint: "bash -c"
+      volumes:
+        - "{{ iroha_deploy_dir }}/iroha_utils.py:/iroha_utils.py:ro"
+      command:
+        - "'pip3 install iroha &>/dev/null && python3 /iroha_utils.py get_genesis_block 2>/dev/null'"
+      env:
+        IROHA_HOSTS: "{% for iroha_node in iroha_old_nodes %}{{ iroha_node.human_hostname }}:{{ iroha_torii_port }}{% if not loop.last %},{% endif %}{% endfor %}"
+        IROHA_ACCOUNT: "{{ iroha_service_account }}"
+        IROHA_ACCOUNT_KEYS: "{{ iroha_service_account_keys | join(',') }}"
+    register: iroha_command_register
+  - debug:
+      msg: "{{ (iroha_command_register.ansible_facts.docker_container.Output | from_json).exit_code }}"
+  when: node_change
+  delegate_to: "{{ iroha_command_host }}"
+  run_once: yes
+  tags: ["iroha-docker", "iroha-config-gen"]
+
 - block:
   - name: copy custom genesis block
     copy:
@@ -8,7 +91,7 @@
     failed_when: iroha_custom_genesis_block_path is not defined
 
   - name: generate Iroha configs
-    command: "./config_gen.sh -p{{ iroha_all_nodes | join(',', attribute='hostname') }} -o{{ iroha_config_local_dir }} -f"
+    command: "./config_gen.sh -p{{ iroha_all_new_nodes | join(',', attribute='hostname') }} -o{{ iroha_config_local_dir }} -f"
     run_once: yes
     args:
       chdir: "{{ role_path }}/files"
@@ -17,25 +100,46 @@
     file:
       path: "{{ iroha_config_local_dir }}/{{ inventory_hostname }}/conf/{{ item.human_hostname }}"
       state: directory
-    loop: "{{ iroha_nodes }}"
+    loop: "{{ iroha_new_nodes }}"
+
+  - name: add pub keys to iroha_new_nodes variable
+    set_fact:
+      iroha_all_new_nodes_temp: "{{ (iroha_all_new_nodes_temp | default([])) + [item | combine({'pub_key': lookup('file', iroha_config_local_dir + '/' + item.hostname + '.pub')})] }}"
+    loop: "{{ iroha_all_new_nodes }}"
+    when: iroha_all_new_nodes and node_change
+    run_once: yes
+
+  - name: add pub keys to iroha_new_nodes variable
+    set_fact:
+      iroha_all_new_nodes: "{{ iroha_all_new_nodes_temp }}"
+    when: iroha_all_new_nodes_temp is defined
+    run_once: yes
 
   - name: move keys
     copy:
       src: "{{ iroha_config_local_dir }}/{{ item[0].hostname }}{{ item[1] }}"
       dest: "{{ iroha_config_local_dir }}/{{ inventory_hostname }}/conf/{{ item[0].human_hostname }}"
-    loop: "{{ iroha_nodes | product(['.priv', '.pub']) | list }}"
+    loop: "{{ iroha_new_nodes | product(['.priv', '.pub']) | list }}"
 
   - name: move genesis.block
     copy:
       src: "{{ iroha_config_local_dir }}/genesis.block"
       dest: "{{ iroha_config_local_dir }}/{{ inventory_hostname }}/conf/{{ item.human_hostname }}"
-    loop: "{{ iroha_nodes }}"
+    loop: "{{ iroha_new_nodes }}"
+    when: not node_change
+
+  - name: move genesis.block
+    copy:
+      content: "{{ (iroha_command_register.ansible_facts.docker_container.Output | from_json).result | to_nice_json }}"
+      dest: "{{ iroha_config_local_dir }}/{{ inventory_hostname }}/conf/{{ item.human_hostname }}/genesis.block"
+    loop: "{{ iroha_new_nodes }}"
+    when: node_change
 
   - name: cleanup
     file:
       path: "{{ iroha_config_local_dir }}/{{ item[0].hostname }}{{ item[1] }}"
       state: absent
-    loop: "{{ iroha_nodes | product(['.priv', '.pub']) | list }}"
+    loop: "{{ iroha_new_nodes | product(['.priv', '.pub']) | list }}"
 
   - name: cleanup
     file:
@@ -44,13 +148,14 @@
     run_once: yes
   become: no
   delegate_to: localhost
-  when: iroha_generate_init_configs
+  when: iroha_all_new_nodes
   tags: ["iroha-docker", "iroha-config-gen"]
 
 - name: create deploy dir
   file:
     state: directory
     path: "{{ iroha_deploy_dir }}/conf"
+  when: iroha_new_nodes
   tags: ["iroha-docker", "iroha-config-gen"]
 
 - name: copy config files
@@ -59,5 +164,25 @@
     dest: "{{ iroha_deploy_dir }}/conf/"
     recursive: yes
     checksum: yes
-  when: iroha_generate_init_configs
+  when: iroha_new_nodes
   tags: ["iroha-docker", "iroha-config-gen"]
+
+- debug:
+    var: iroha_command_host
+  tags: ["iroha-docker"]
+
+- debug:
+    var: iroha_new_nodes
+  tags: ["iroha-docker"]
+
+- debug:
+    var: iroha_all_new_nodes
+  tags: ["iroha-docker"]
+
+- debug:
+    var: iroha_old_nodes
+  tags: ["iroha-docker"]
+
+- debug:
+    var: node_change
+  tags: ["iroha-docker"]

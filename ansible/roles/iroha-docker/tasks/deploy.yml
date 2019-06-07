@@ -34,5 +34,40 @@
     docker_service:
       project_src: "{{ iroha_deploy_dir }}"
     tags: ["iroha-deploy"]
-  when: iroha_update_runtime_configs
+
+  - name: Add node
+    docker_container:
+      name: "iroha_command"
+      image: "python:stretch"
+      recreate: yes
+      detach: no
+      cleanup: yes
+      networks:
+        - name: "{{iroha_network_name}}"
+      entrypoint: "bash -c"
+      volumes:
+        - "{{ iroha_deploy_dir }}/iroha_utils.py:/iroha_utils.py:ro"
+      command:
+        - "'pip3 install iroha &>/dev/null && python3 /iroha_utils.py add_peer {{ item.hostname }} {{ item.pub_key }}'"
+      env:
+        IROHA_HOSTS: "{% for iroha_node in iroha_old_nodes %}{{ iroha_node.human_hostname }}:{{ iroha_torii_port }}{% if not loop.last %},{% endif %}{% endfor %}"
+        IROHA_ACCOUNT: "{{ iroha_service_account }}"
+        IROHA_ACCOUNT_KEYS: "{{ iroha_service_account_keys | join(',') }}"
+    when: node_change
+    loop: "{{ iroha_all_new_nodes }}"
+    register: iroha_command_register
+    delegate_to: "{{ iroha_command_host }}"
+    run_once: yes
+
+#  - name: Add node result
+#    debug:
+#      msg: "{{ iroha_command_register }}"
+#    when: node_change
+
+  - name: Add node result
+    debug:
+      msg: "{{ item.ansible_facts.docker_container.Output | from_json }}"
+    loop: iroha_command_register.results
+    when: node_change
+
   tags: ["iroha-docker"]

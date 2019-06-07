@@ -42,20 +42,6 @@ iroha_network_gateway: '10.10.111.1'
 iroha_docker_tag: '1.0.0'
 iroha_postgres_docker_tag: '9.5'
 
-## The block of variables that toggles certain tasks of the role
-# Toggle tasks in `init-vars.yml` file. Will initialize variables for container names,
-# Iroha hostnames, etc. No configs will be changed.
-# Default: true
-iroha_init_vars: true
-# Toggle tasks in `config-gen.yml` file. Will generate new keys for Iroha with a new Genesis
-# Block
-# Default: true
-iroha_generate_init_configs: true
-# Toggle tasks in `deploy.yml` file. Enable if you just need to update Iroha configs and Docker
-# Compose file
-# Default: true
-iroha_update_runtime_configs: true
-
 # Toggles usage of a custom Genesis Block. Useful if you have custom roles, users, permissions,
 # etc. The role will fill your custom Genesis Block with Iroha peers while preserving everything
 # else.
@@ -91,6 +77,12 @@ iroha_blockstore_path: /tmp/block_store
 #iroha_max_rounds_delay: 3000
 #iroha_stale_stream_max_rounds: 2
 
+## Custom configuration
+# Docker environment variables
+iroha_docker_env_variables: {}
+# Docker environment labels
+iroha_docker_labels: {}
+
 ## Iroha logging
 # Maximum docker log file size
 iroha_docker_logging_max_size: '100m'
@@ -100,3 +92,16 @@ iroha_docker_logging_max_file: 3
 ## Iroha RAM limit
 # Maximum amount of RAM, it only limits the docker container (e.g. '1024m')
 iroha_docker_mem_limit: ''
+
+##  Iroha logs
+# Enable debug log
+iroha_log_debug: Flase
+
+## Iroha service
+# Iroha commands run on host which has 'iroha_service_host' variable set to true
+iroha_service_host: False
+# Service account used fo execute iroha commands (like 'AddPeer')
+# Account must have permissions: 'can_add_peer', 'can_get_blocks'
+iroha_service_account: ''
+#  The number of keys must match the quorum settings
+iroha_service_account_keys: []

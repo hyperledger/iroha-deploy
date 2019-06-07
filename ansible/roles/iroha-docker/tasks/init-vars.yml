@@ -46,5 +46,4 @@
 
   become: no
   delegate_to: localhost
-  when: iroha_init_vars
   tags: ["iroha-docker", "iroha-init-vars"]
