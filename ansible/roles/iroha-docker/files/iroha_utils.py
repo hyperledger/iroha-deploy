@@ -11,9 +11,6 @@ from google.protobuf.json_format import MessageToJson
 
 params = {'iroha_hosts': '', 'iroha_account': '', 'iroha_account_keys': ''}
 
-# admin_account = 'admin@nbc'
-# admin_keys = ['72a9eb49c0cd469ed64f653e33ffc6dde475a6b9fd8be615086bce7c44b5a8f8']
-# iroha_host = 'iroha-expand1.dev.iroha.tech:50051'
 
 def send_transaction(transaction):
     hex_hash = binascii.hexlify(iroha.IrohaCrypto.hash(transaction))
@@ -109,14 +106,8 @@ if __name__ ==  "__main__":
             else:
                 exit_and_result(1, "Command failed")
         elif command == 'add_peer' and len(sys.argv) == 4:
-            if sys.argv[2] == '0' and sys.argv[3] == '0':
-                peer_priv_key = iroha.IrohaCrypto.private_key()
-                peer_host = 'iroha-expand1.dev.internal:10006'
-                peer_pub_key = iroha.IrohaCrypto.derive_public_key(peer_priv_key)
-                logging.info('Public peer key: ' + peer_pub_key.__str__())
-            else:
-                peer_host = sys.argv[2]
-                peer_pub_key = sys.argv[3]
+            peer_host = sys.argv[2]
+            peer_pub_key = sys.argv[3]
             if add_peer(peer_host, peer_pub_key):
                 exit_and_result(0)
             else:

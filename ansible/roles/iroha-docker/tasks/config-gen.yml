@@ -22,6 +22,11 @@
     loop: "{{ ansible_play_hosts }}"
     run_once: yes
 
+  - name: New nodes
+    debug:
+      var: iroha_all_new_nodes
+    run_once: yes
+
   - name: set iroha_old_nodes variable
     set_fact:
       iroha_old_nodes: "{{ iroha_nodes | difference(iroha_new_nodes) }}"
@@ -74,8 +79,6 @@
         IROHA_ACCOUNT: "{{ iroha_service_account }}"
         IROHA_ACCOUNT_KEYS: "{{ iroha_service_account_keys | join(',') }}"
     register: iroha_command_register
-  - debug:
-      msg: "{{ (iroha_command_register.ansible_facts.docker_container.Output | from_json).exit_code }}"
   when: node_change
   delegate_to: "{{ iroha_command_host }}"
   run_once: yes
@@ -166,23 +169,3 @@
     checksum: yes
   when: iroha_new_nodes
   tags: ["iroha-docker", "iroha-config-gen"]
-
-- debug:
-    var: iroha_command_host
-  tags: ["iroha-docker"]
-
-- debug:
-    var: iroha_new_nodes
-  tags: ["iroha-docker"]
-
-- debug:
-    var: iroha_all_new_nodes
-  tags: ["iroha-docker"]
-
-- debug:
-    var: iroha_old_nodes
-  tags: ["iroha-docker"]
-
-- debug:
-    var: node_change
-  tags: ["iroha-docker"]

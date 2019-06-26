@@ -58,16 +58,4 @@
     register: iroha_command_register
     delegate_to: "{{ iroha_command_host }}"
     run_once: yes
-
-#  - name: Add node result
-#    debug:
-#      msg: "{{ iroha_command_register }}"
-#    when: node_change
-
-  - name: Add node result
-    debug:
-      msg: "{{ item.ansible_facts.docker_container.Output | from_json }}"
-    loop: iroha_command_register.results
-    when: node_change
-
   tags: ["iroha-docker"]

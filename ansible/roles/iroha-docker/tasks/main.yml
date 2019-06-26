@@ -1,17 +1,3 @@
-- name: stop Iroha
-  docker_service:
-    state: absent
-    remove_volumes: yes
-    project_src: "{{ iroha_deploy_dir }}"
-  failed_when: False
-  tags: ["iroha-docker"]
-
-- name: delete deploy dir
-  file:
-    state: absent
-    path: "{{ iroha_deploy_dir }}"
-  tags: ["iroha-docker"]
-
 - name: init vars
   include: init-vars.yml
 
