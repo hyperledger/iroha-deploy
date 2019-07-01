@@ -3,8 +3,7 @@ version: "2.4"
 services:
 {% for node in iroha_nodes %}
   {{ node.human_hostname }}:
-#    image: hyperledger/iroha:{{ iroha_docker_tag }}
-    image: soramitsu/iroha:1.0.1-vote-log
+    image: hyperledger/iroha:{{ iroha_docker_tag }}
 {% if iroha_overlay_network %}
     container_name: {{ node.hostname.split(':')[0] }}
     expose:

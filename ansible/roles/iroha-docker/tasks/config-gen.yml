@@ -33,8 +33,7 @@
 
   - name: set node_change variable 1
     set_fact:
-      node_change: true
-    when: iroha_all_new_nodes and (( iroha_all_new_nodes | length ) < ( iroha_all_nodes | length ))
+      node_change: "{{ iroha_all_new_nodes and (( iroha_all_new_nodes | length ) < ( iroha_all_nodes | length )) }}"
     run_once: yes
 
   - name: set node_change variable 2
