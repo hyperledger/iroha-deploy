@@ -99,6 +99,7 @@ iroha_log_debug: Flase
 
 ## Iroha service
 # Iroha commands run on host which has 'iroha_service_host' variable set to true
+# You need to select any node and set this variable to `true`
 iroha_service_host: False
 # Service account used fo execute iroha commands (like 'AddPeer')
 # Account must have permissions: 'can_add_peer', 'can_get_blocks'

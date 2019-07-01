@@ -31,13 +31,13 @@
     set_fact:
       iroha_old_nodes: "{{ iroha_nodes | difference(iroha_new_nodes) }}"
 
-  - name: set node_change variable
+  - name: set node_change variable 1
     set_fact:
       node_change: true
     when: iroha_all_new_nodes and (( iroha_all_new_nodes | length ) < ( iroha_all_nodes | length ))
     run_once: yes
 
-  - name: set node_change variable
+  - name: set node_change variable 2
     set_fact:
       node_change: false
     when: node_change is not defined
@@ -105,14 +105,14 @@
       state: directory
     loop: "{{ iroha_new_nodes }}"
 
-  - name: add pub keys to iroha_new_nodes variable
+  - name: add pub keys to iroha_new_nodes variable 1
     set_fact:
       iroha_all_new_nodes_temp: "{{ (iroha_all_new_nodes_temp | default([])) + [item | combine({'pub_key': lookup('file', iroha_config_local_dir + '/' + item.hostname + '.pub')})] }}"
     loop: "{{ iroha_all_new_nodes }}"
     when: iroha_all_new_nodes and node_change
     run_once: yes
 
-  - name: add pub keys to iroha_new_nodes variable
+  - name: add pub keys to iroha_new_nodes variable 2
     set_fact:
       iroha_all_new_nodes: "{{ iroha_all_new_nodes_temp }}"
     when: iroha_all_new_nodes_temp is defined
@@ -124,27 +124,27 @@
       dest: "{{ iroha_config_local_dir }}/{{ inventory_hostname }}/conf/{{ item[0].human_hostname }}"
     loop: "{{ iroha_new_nodes | product(['.priv', '.pub']) | list }}"
 
-  - name: move genesis.block
+  - name: move genesis.block 1
     copy:
       src: "{{ iroha_config_local_dir }}/genesis.block"
       dest: "{{ iroha_config_local_dir }}/{{ inventory_hostname }}/conf/{{ item.human_hostname }}"
     loop: "{{ iroha_new_nodes }}"
     when: not node_change
 
-  - name: move genesis.block
+  - name: move genesis.block 2
     copy:
       content: "{{ (iroha_command_register.ansible_facts.docker_container.Output | from_json).result | to_nice_json }}"
       dest: "{{ iroha_config_local_dir }}/{{ inventory_hostname }}/conf/{{ item.human_hostname }}/genesis.block"
     loop: "{{ iroha_new_nodes }}"
     when: node_change
 
-  - name: cleanup
+  - name: cleanup 1
     file:
       path: "{{ iroha_config_local_dir }}/{{ item[0].hostname }}{{ item[1] }}"
       state: absent
     loop: "{{ iroha_new_nodes | product(['.priv', '.pub']) | list }}"
 
-  - name: cleanup
+  - name: cleanup 2
     file:
       path: "{{ iroha_config_local_dir }}/genesis.block"
       state: absent
