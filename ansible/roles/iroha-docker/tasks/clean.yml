@@ -1,0 +1,15 @@
+- name: Stop Iroha
+  docker_compose:
+    state: absent
+    remove_volumes: yes
+    project_src: "{{ iroha_deploy_dir }}"
+  ignore_errors: yes
+  when: iroha_forced_cleaning
+  tags: ["iroha-docker", "iroha-clean"]
+
+- name: Delete deploy dir
+  file:
+    state: absent
+    path: "{{ iroha_deploy_dir }}"
+  when: iroha_forced_cleaning
+  tags: ["iroha-docker", "iroha-clean"]

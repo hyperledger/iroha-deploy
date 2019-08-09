@@ -1,7 +1,7 @@
 # handlers file for Iroha
 ---
 - name: restart Iroha
-  docker_service:
+  docker_compose:
     project_src: "{{ iroha_deploy_dir }}"
     pull: yes
     state: present

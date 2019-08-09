@@ -37,6 +37,7 @@
       build:
         path: "{{ iroha_deploy_dir }}"
         dockerfile: "Dockerfile_iroha_python"
+        pull: yes
       source: build
       force_source: yes
     delegate_to: "{{ iroha_command_host }}"

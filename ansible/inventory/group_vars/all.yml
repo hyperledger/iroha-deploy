@@ -1,4 +1,6 @@
 ---
+ansible_python_interpreter: "/usr/bin/python3"
+
 torii_port: 50051
 internal_port: 10001
 

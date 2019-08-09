@@ -27,7 +27,7 @@
     tags: ["iroha-deploy"]
 
   - name: Run Iroha
-    docker_service:
+    docker_compose:
       project_src: "{{ iroha_deploy_dir }}"
     tags: ["iroha-deploy"]
 
@@ -40,6 +40,7 @@
       cleanup: yes
       networks:
         - name: "{{iroha_network_name}}"
+      networks_cli_compatible: no
       command:
         - "add_peer {{ item.hostname }} {{ item.pub_key }}"
       env:
