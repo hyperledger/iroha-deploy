@@ -15,11 +15,11 @@ This method is also suitable for local-only deployments and does not require any
   Tested on Ubuntu 16.04, 18.04
   - Local:
     - python3
-    - ansible(>=2.4)
+    - ansible(>=2.8)
   - Remote:
     - Docker (>=17.12)
     - python3
-    - PIP modules: docker, docker-compose
+    - PIP3 modules: docker, docker-compose
 
     There is a role for setting up a remote part of the dependencies named `docker`. It works for Ubuntu OS only. Check `iroha-docker` playbook.
 
@@ -41,9 +41,9 @@ This method is also suitable for local-only deployments and does not require any
 
     Put this file into `../../inventory/` directory.
 
-`cd ../../ && ansible-playbook -b -e 'ansible_ssh_user=ubuntu' -i inventory/iroha.list playbooks/iroha-docker/main.yml`
+`cd ../../ && ansible-playbook -b -e 'ansible_ssh_user=ubuntu' -e 'iroha_service_host=True' -i inventory/iroha.list playbooks/iroha-docker/main.yml`
 
-This will deploy 6 Iroha Docker containers along with 6 Postgres containers on the remote host specified in `iroha.list` file. Remote user is `ubuntu`. Torii port of each container is exposed on the host. Iroha peer can be communicated over port defined in `iroha_torii_port` variable (50051 by default). Overall, each host will listen the following port range: `iroha_torii_port` ... `iroha_torii_port` + *number-of-containers* - 1.
+This will deploy 4 Iroha Docker containers along with one Postgres containers on the remote host specified in `iroha.list` file. Remote user is `ubuntu`. Torii port of each container is exposed on the host. Iroha peer can be communicated over port defined in `iroha_torii_port` variable (50051 by default). Overall, each host will listen the following port range: `iroha_torii_port` ... `iroha_torii_port` + *number-of-containers* - 1.
 It will also install Docker along with required python modules. If you want to skip this step, comment out `docker` role in the playbook (`playbooks/iroha-docker/main.yml`)
 
 **Note:**
@@ -78,6 +78,7 @@ Deploying 6 Iroha peers on two remote hosts communicating using public IP addres
     **192.168.122.109.yml**
     ```
     iroha_replicas: 2
+    iroha_service_host: True
     ```
 
     **192.168.122.30.yml**

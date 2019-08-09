@@ -4,6 +4,11 @@
 # Default: 4
 iroha_replicas: 4
 
+# DANGER!!!
+# Set it to `true` to full clean ALL existing iroha data before deployment process.
+# All peer keys, blockstore, configs will be DELETED!
+iroha_forced_cleaning: False
+
 # Whether to use custom hostname for EACH container.
 # If set to `true`, Iroha peers will communicate using these hostnames. Hostnames should be set using
 # `iroha_hostnames` variable. See example playbook in `playbooks/iroha-docker/main.yml`.
@@ -68,9 +73,9 @@ iroha_blockstore_path: /tmp/block_store
 #iroha_stale_stream_max_rounds: 2
 
 ## Custom Docker configuration
-# Docker environment variables
+# Docker container environment variables
 iroha_docker_env_variables: {}
-# Docker environment labels
+# Docker container labels
 iroha_docker_labels: {}
 
 ## Iroha logging
@@ -85,11 +90,11 @@ iroha_docker_mem_limit: ''
 
 ##  Iroha logs
 # Enable debug log
-iroha_log_debug: Flase
+iroha_log_debug: False
 
 ## Iroha service
 # Iroha commands run on host which has 'iroha_service_host' variable set to true
-# You need to select any node and set this variable to `true`
+# You need to select any node and set this variable to `True`
 iroha_service_host: False
 # Service account used for execute iroha commands (like 'AddPeer')
 # Account must have permissions: 'can_add_peer', 'can_get_blocks'
@@ -107,6 +112,7 @@ iroha_peer_keys_ansible_encrypt_password_file: ''
 
 # Iroha Genesis Block
 # The role will fill your Genesis Block with Iroha peers while preserving everything else
+# You can find example private keys for accounts in https://github.com/hyperledger/iroha/tree/master/example
 iroha_genesis_block: '
   {
     "block_v1":{

@@ -64,11 +64,6 @@
   when: iroha_peer_keys_ansible_encrypt_enable and iroha_peer_keys_ansible_encrypt_password_file
   run_once: yes
 
-- debug:
-    var: iroha_ansible_vault_key
-  when: iroha_ansible_vault_key is defined
-  run_once: yes
-
 - name: Generate peer keys
   docker_container:
     name: "iroha_command_for_{{ ansible_host }}"
@@ -78,7 +73,7 @@
     cleanup: yes
     command:
       - "gen_keys {{ iroha_invalid_peer_list | length }}"
-  when: iroha_invalid_peer_list
+  when: iroha_invalid_peer_list | length > 0
   register: iroha_command_register
   delegate_to: "{{ iroha_command_host }}"
   become: yes

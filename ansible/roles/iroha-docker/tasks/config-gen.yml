@@ -17,6 +17,7 @@
           cleanup: yes
           networks:
             - name: "{{iroha_network_name}}"
+          networks_cli_compatible: no
           command:
             - "get_genesis_block"
           env:
@@ -43,7 +44,7 @@
         set_fact:
           iroha_genesis_block_commands: "{{ (iroha_genesis_block_commands | default([])) + [item] }}"
         loop: "{{ iroha_new_genesis_block['block_v1']['payload']['transactions'][0]['payload']['reducedPayload']['commands'] }}"
-        when: "{{ 'addPeer' not in item }}"
+        when: '"addPeer" not in item'
 
       - name: Generate genesis.block 3
         set_fact:

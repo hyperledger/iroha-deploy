@@ -29,7 +29,7 @@ def init_params():
 
 def send_transaction(transaction):
     hex_hash = binascii.hexlify(iroha.IrohaCrypto.hash(transaction))
-    logging.info('Transaction hash: {}, transactionc reator: {}'.format(
+    logging.info('Transaction hash: {}, transaction creator: {}'.format(
         hex_hash, transaction.payload.reduced_payload.creator_account_id))
     for iroha_host in params['iroha_hosts']:
         try:
@@ -138,7 +138,7 @@ if __name__ ==  "__main__":
                 exit_and_result(0)
             else:
                 exit_and_result(1, "Command failed")
-        elif command == 'gen_keys' and len(sys.argv) <= 3 and len(sys.argv) >= 2:
+        elif command == 'gen_keys' and len(sys.argv) in [2,3]:
             if len(sys.argv) == 2:
                 exit_and_result(0, gen_keys())
             else:
