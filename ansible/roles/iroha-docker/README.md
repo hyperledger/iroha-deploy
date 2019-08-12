@@ -79,6 +79,9 @@ Deploying 6 Iroha peers on two remote hosts communicating using public IP addres
     ```
     iroha_replicas: 2
     iroha_service_host: True
+    # this is account and private key from example genesis.block
+    iroha_service_account: admin@test
+    iroha_service_account_keys: [ 'f101537e319568c765b2cc89698325604991dca57b9716b58016b253506cab70' ]
     ```
 
     **192.168.122.30.yml**
