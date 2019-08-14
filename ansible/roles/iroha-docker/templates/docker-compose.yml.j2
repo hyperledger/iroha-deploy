@@ -34,7 +34,9 @@ services:
     depends_on:
       - {{ iroha_inventory_human_hostname }}-postgres
     networks:
+{% if iroha_custom_hostnames and not iroha_overlay_network %}
       - {{ iroha_network_name }}
+{% endif %}
       - iroha-db-net
     logging:
       driver: "json-file"
@@ -71,8 +73,10 @@ volumes:
   psql_storage-{{ iroha_inventory_human_hostname }}:
 
 networks:
+{% if iroha_custom_hostnames and not iroha_overlay_network %}
   {{ iroha_network_name }}:
     external:
       name: {{ iroha_network_name }}
+{% endif %}
   iroha-db-net:
     name: iroha-db-net
