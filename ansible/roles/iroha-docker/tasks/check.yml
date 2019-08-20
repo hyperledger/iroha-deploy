@@ -1,0 +1,23 @@
+# tasks in this file check that role can be aplaid to hosts
+
+- block:
+  - name: check | check for deprecated varible
+    fail:
+      msg: "iroha_overlay_network is deprecated use: 'iroha_network'"
+    when: iroha_overlay_network is defined
+
+  - name: check | check iroha_hostnames length and iroha_replicas
+    fail:
+      msg: "'iroha_hostnames' length ({{ iroha_hostnames|length }}) should match the 'iroha_replicas' ({{ iroha_replicas }})"
+    when: iroha_custom_hostnames and iroha_hostnames is defined and iroha_hostnames | length != iroha_replicas
+
+  - name: check | check iroha_network
+    fail:
+      msg: "You can not use iroha_network == 'internal' if you have more when one host"
+    when: iroha_network == 'internal' and ansible_play_hosts | length > 1
+
+  - name: Check | Stop playbook if one host fail
+    meta: end_play
+    when: ansible_play_hosts_all != ansible_play_hosts
+
+  tags: ["iroha-docker", "iroha-check"]

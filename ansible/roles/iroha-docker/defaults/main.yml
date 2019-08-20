@@ -18,15 +18,13 @@ iroha_forced_cleaning: False
 # Default: false
 iroha_custom_hostnames: false
 
-# Affects how Iroha peers are communicated. If set to `true`, Docker overlay network with that
-# name will be used. It must be created beforehand. The recommended way is to use Swarm cluster
-# or create a network manually using a KV storage.
-# Setting it to `true` without creating the network will only work for a single host deployment
-# (Iroha peers will only be able to communicate within that host). Suitable for local-only
-# deployments for testing purposes.
+# Affects how Iroha peers are communicated.
+# If set to `internal` Iroha will use docker network to communicate between nodes
+# If set to `overlay` Iroha will create docker overlay network to communicate between node.
+# If set to `external` Iroha will map port to host and will use it to communicate..
 #
-# Default: false
-iroha_overlay_network: false
+# Default: external
+iroha_network: external
 
 ## Deployment configs
 iroha_container_basename: iroha
@@ -34,8 +32,7 @@ iroha_container_basename: iroha
 iroha_deploy_dir: /opt/iroha-deploy
 # Overlay network name
 # If using overlay network plugin (like Calico) the network must be created prior running this role
-# The network will be created automatically if deploying locally or with `iroha_overlay_network`
-# set to `false`
+# The network will be created automatically if deploying with `iroha_network` set to `external` or `internal`
 iroha_network_name: iroha-net
 iroha_network_address: '10.10.111.0/24'
 iroha_network_gateway: '10.10.111.1'

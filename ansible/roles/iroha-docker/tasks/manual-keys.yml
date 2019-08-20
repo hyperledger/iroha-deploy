@@ -30,7 +30,7 @@
 
 - name: Set 'iroha_invalid_peer_list' variable 1
   set_fact:
-    iroha_invalid_peer_list: "{{ iroha_nodes | difference(iroha_peer_keys_from_file[inventory_hostname].keys()) | default([]) }}"
+    iroha_invalid_peer_list: "{{ iroha_nodes | difference((iroha_peer_keys_from_file[inventory_hostname] | default({})).keys()) | default([]) }}"
   when: iroha_peer_keys_from_file is defined
 
 - name: Set 'iroha_invalid_peer_list' variable 2
@@ -66,7 +66,7 @@
 
 - name: Generate peer keys
   docker_container:
-    name: "iroha_command_for_{{ ansible_host }}"
+    name: "iroha_command_{{ 999999 | random }}"
     image: "iroha-docker-iroha-python"
     recreate: yes
     detach: no
@@ -89,7 +89,7 @@
 
   - name: Encrypt peer keys
     docker_container:
-      name: "iroha_command_for_{{ ansible_host }}"
+      name: "iroha_command_{{ 999999 | random }}"
       image: "iroha-docker-iroha-python"
       recreate: yes
       detach: no

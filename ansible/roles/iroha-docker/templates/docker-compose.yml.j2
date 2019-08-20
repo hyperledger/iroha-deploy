@@ -4,14 +4,14 @@ services:
 {% for node in iroha_nodes %}
   {{ node.human_hostname }}:
     image: hyperledger/iroha:{{ iroha_docker_tag }}
-{% if iroha_overlay_network %}
+{% if iroha_network != 'external' %}
     container_name: {{ node.hostname.split(':')[0] }}
     expose:
       - {{ iroha_peer_port }}
     ports:
       - {{ iroha_torii_port | int + loop.index - 1 }}:{{ iroha_torii_port }}
 {% else %}
-    container_name: {{ node.human_hostname }}
+    container_name: {{ iroha_container_basename }}-{{ node.human_hostname }}
     ports:
       - {{ node.peer_port }}:{{ iroha_peer_port }}
       - {{ iroha_torii_port | int + loop.index - 1 }}:{{ iroha_torii_port }}

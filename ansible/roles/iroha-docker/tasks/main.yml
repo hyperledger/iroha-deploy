@@ -1,3 +1,6 @@
+- name: Iroha check
+  include: check.yml
+
 - name: Iroha clean
   include: clean.yml
 
