@@ -3,21 +3,21 @@
       iroha_nodes: []
       iroha_peers_map: []
 
-  - name: Generate hostnames (no overlay)
+  - name: Generate hostnames (external)
     set_fact:
       iroha_nodes: "{{ iroha_nodes }} + [ '{{ inventory_hostname }}:{{ iroha_peer_port | int + item | int }}' ]"
     loop: "{{ range(0, iroha_replicas |int) | list }}"
-    when: not iroha_custom_hostnames and not iroha_overlay_network
+    when: not iroha_custom_hostnames and iroha_network == 'external'
 
-  - name: Generate hostnames (overlay)
+  - name: Generate hostnames (overlay/internal)
     set_fact:
       iroha_nodes: "{{ iroha_nodes }} + [ '{{ iroha_container_basename }}-{{ item }}-{{ inventory_hostname | checksum | regex_replace('(^[a-fA-F0-9]{8}).+$', '\\1') }}:{{ iroha_peer_port }}' ]"
     loop: "{{ range(0, iroha_replicas) | list }}"
-    when: not iroha_custom_hostnames and iroha_overlay_network
+    when: not iroha_custom_hostnames and iroha_network != 'external'
 
   - name: Generate hostnames (iroha_custom_hostnames)
     set_fact:
-      iroha_nodes: "{{ iroha_nodes }} + [ '{% if item.split(':') | length < 2 %}{{ item }}:{% if iroha_overlay_network %}{{ iroha_peer_port }}{% else %}{{ iroha_peer_port | int + idx }}{% endif %}{% else %}{{ item }}{% endif %}' ]"
+      iroha_nodes: "{{ iroha_nodes }} + [ '{% if item.split(':') | length < 2 %}{{ item }}:{% if iroha_network != 'external' %}{{ iroha_peer_port }}{% else %}{{ iroha_peer_port | int + idx }}{% endif %}{% else %}{{ item }}{% endif %}' ]"
     when: iroha_custom_hostnames and iroha_hostnames is defined
     loop: "{{ iroha_hostnames }}"
     loop_control:

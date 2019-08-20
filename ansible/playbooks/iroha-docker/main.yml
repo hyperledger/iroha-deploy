@@ -2,5 +2,3 @@
   strategy: linear
   roles:
     - { role: iroha-docker, tags: iroha-docker }
-  vars:
-    iroha_hostnames: []
