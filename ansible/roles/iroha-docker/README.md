@@ -93,8 +93,51 @@ Deploying 6 Iroha peers on two remote hosts communicating using public IP addres
 ```
 ansible-playbook -i inventory/iroha.list -b playbooks/iroha-docker/main.yml
 ```
-
 **Example 2**
+Deploying 3 Iroha peers on two remote hosts communicating using DNS name. With 2 and 1 replicas on each host respectively.
+We will use pivate ip (`192.168.122.109, 192.168.122.30`) to connect and deploy Iroha and we will use DNS name (`iroha[1-3].example.com`) to communicate between peers.
+
+1. Create inventory list containing IP addresses (or hostnames) of two hosts that will run Iroha peers.
+
+    **iroha.list**
+    ```
+    [all]
+    192.168.122.109
+    192.168.122.30
+    ```
+
+    Put this file into `../../inventory/` directory.
+
+2. Make sure you can SSH with a root account into either of these hosts using a private key.
+
+    **Note**
+    > You can also SSH with the user other than root. Make sure it can execute `sudo` without prompting for a password. Set `-u` option for `ansible-playbook` command.
+
+3. Create two YAML files in `../playbooks/iroha-docker/host_vars` directory:
+    **192.168.122.109.yml**
+    ```
+    iroha_replicas: 2
+    iroha_service_host: True
+    # this is account and private key from example genesis.block
+    iroha_service_account: admin@test
+    iroha_service_account_keys: [ 'f101537e319568c765b2cc89698325604991dca57b9716b58016b253506cab70' ]
+    iroha_custom_hostnames: true
+    iroha_hostnames: ["iroha1.example.com:10001","iroha2.example.com:10002"] # we use different port because both replica are in one server
+    ```
+
+    **192.168.122.30.yml**
+    ```
+    iroha_replicas: 1
+    iroha_custom_hostnames: true
+    iroha_hostnames: ["iroha3.example.com:10001"]
+    ```
+
+ 4. Run the playbook
+```
+ansible-playbook -i inventory/iroha.list -b playbooks/iroha-docker/main.yml
+```
+
+**Example 3**
 Deploying 6 Iroha peers on two remote hosts communicating over overlay network (Calico) using custom hostnames.
 
 **TBD**
