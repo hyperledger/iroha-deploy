@@ -11,7 +11,7 @@ iroha_forced_cleaning: False
 
 # Whether to use custom hostname for EACH container.
 # If set to `true`, Iroha peers will communicate using these hostnames. Hostnames should be set using
-# `iroha_hostnames` variable. See example playbook in `playbooks/iroha-docker/main.yml`.
+# `iroha_hostnames` variable. See example in `ansible/roles/iroha-docker/README.md `.
 # If set to `false`, Iroha peers will communicate by IP addresses set by `inventory_hostname`
 # variable. Container and service names in Docker Compose files will be auto-generated.
 #
@@ -20,8 +20,8 @@ iroha_custom_hostnames: false
 
 # Affects how Iroha peers are communicated.
 # If set to `internal` Iroha will use docker bridge network to communicate between nodes. You can only use this mode if you want to deploy all nodes on one host  
-# If set to `overlay` Iroha will create a docker overlay network to communicate between node.
-# If set to `external` Iroha will map the port to host and will use it to communicate. Overlay network plugin (like Calico) or docker swarm should be enabled on all host.
+# If set to `overlay` Iroha will create a docker overlay network to communicate between node. Overlay network plugin (like Calico) or docker swarm should be enabled on all host.
+# If set to `external` Iroha will map the port to host system and will use it to communicate.
 #
 # Default: external
 iroha_network: external
