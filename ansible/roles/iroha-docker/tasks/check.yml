@@ -1,7 +1,7 @@
-# tasks in this file check that role can be aplaid to hosts
+# tasks in this file check that role can be applied to hosts
 
 - block:
-  - name: check | check for deprecated varible
+  - name: check | check for deprecated variable
     fail:
       msg: "iroha_overlay_network is deprecated use: 'iroha_network'"
     when: iroha_overlay_network is defined
@@ -13,7 +13,7 @@
 
   - name: check | check iroha_network
     fail:
-      msg: "You can not use iroha_network == 'internal' if you have more when one host"
+      msg: "You can not use iroha_network == 'internal' if you have more than one host"
     when: iroha_network == 'internal' and ansible_play_hosts | length > 1
 
   - name: Check | Stop playbook if one host fail
