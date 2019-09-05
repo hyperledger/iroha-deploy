@@ -5,7 +5,10 @@
     fail:
       msg: "iroha_overlay_network is deprecated use: 'iroha_network'"
     when: iroha_overlay_network is defined
-
+  - name:
+    fail:
+      msg: "'iroha_postgres_max_prepared_transactions' variable is depricated, use: 'iroha_postgres_commands'"
+    when: iroha_postgres_max_prepared_transactions is defined
   - name: check | check iroha_hostnames length and iroha_replicas
     fail:
       msg: "'iroha_hostnames' length ({{ iroha_hostnames|length }}) should match the 'iroha_replicas' ({{ iroha_replicas }})"
