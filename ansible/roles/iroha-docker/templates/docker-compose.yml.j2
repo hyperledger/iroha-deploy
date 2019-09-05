@@ -3,7 +3,7 @@ version: "2.4"
 services:
 {% for node in iroha_nodes %}
   {{ node.human_hostname }}:
-    image: hyperledger/iroha:{{ iroha_docker_tag }}
+    image: {{ iroha_docker_image }}:{{ iroha_docker_tag }}
 {% if iroha_network != 'external' %}
     container_name: {{ node.hostname.split(':')[0] }}
     expose:
@@ -49,19 +49,25 @@ services:
 {% endfor %}
 
   {{ iroha_inventory_human_hostname }}-postgres:
-    image: postgres:{{ iroha_postgres_docker_tag }}
+    image: {{ iroha_postgres_docker_image }}:{{ iroha_postgres_docker_tag }}
     container_name: {{ iroha_inventory_human_hostname }}-postgres
     environment:
       POSTGRES_PASSWORD: {{ iroha_postgres_password }}
     expose:
       - {{ iroha_postgres_port }}
+{% if postgres_docker_labels %}
+    labels:
+{% for label in postgres_docker_labels.items() %}
+      - "{{ label[0] }}={{ label[1] }}"
+{% endfor %}
+{% endif %}
     volumes:
       - psql_storage-{{ iroha_inventory_human_hostname }}:/var/lib/postgresql/data
     networks:
       - iroha-db-net
     restart: always
-{% if iroha_postgres_max_prepared_transactions is defined %}
-    command: -c max_prepared_transactions={{ iroha_postgres_max_prepared_transactions }}
+{% if iroha_postgres_commands is defined %}
+    command: {{ iroha_postgres_commands }}
 {% endif %}
 
 volumes:
