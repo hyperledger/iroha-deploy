@@ -3,6 +3,6 @@
 - name: restart Iroha
   docker_compose:
     project_src: "{{ iroha_deploy_dir }}"
-    pull: yes
+    pull: "{{ iroha_pull_image_var }}"
     state: present
     recreate: always
