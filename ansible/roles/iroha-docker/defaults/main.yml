@@ -40,7 +40,7 @@ iroha_deploy_dir: /opt/iroha-deploy
 # The role is incompatible with Iroha versions below RC2 since keys format has changed.
 # Apply the patch (files/old-keys-format.patch) if you need support for previous Iroha versions.
 
-iroha_pull_image_var: yes
+iroha_docker_image_pull: true
 iroha_docker_image: 'hyperledger/iroha'
 iroha_docker_tag: '1.1.0'
 
