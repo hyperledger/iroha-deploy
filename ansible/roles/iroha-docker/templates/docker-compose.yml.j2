@@ -29,7 +29,7 @@ services:
 {% endfor %}
 {% endif %}
     volumes:
-      - iroha_block_store-{{ node.human_hostname }}:/tmp/block_store
+      - {{ iroha_volume_dir }}iroha_block_store-{{ node.human_hostname }}:/tmp/block_store
       - ./conf/{{ node.human_hostname }}:/opt/iroha_data
     depends_on:
       - {{ iroha_inventory_human_hostname }}-postgres
@@ -56,7 +56,7 @@ services:
     expose:
       - {{ iroha_postgres_port }}
     volumes:
-      - psql_storage-{{ iroha_inventory_human_hostname }}:/var/lib/postgresql/data
+      - {{ iroha_volume_dir }}psql_storage-{{ iroha_inventory_human_hostname }}:/var/lib/postgresql/data
     networks:
       - iroha-db-net
     restart: always
@@ -64,11 +64,13 @@ services:
     command: -c max_prepared_transactions={{ iroha_postgres_max_prepared_transactions }}
 {% endif %}
 
+{% if iroha_volume_dir == "" %}
 volumes:
 {% for node in iroha_nodes %}
   iroha_block_store-{{ node.human_hostname }}:
 {% endfor %}
   psql_storage-{{ iroha_inventory_human_hostname }}:
+{% endif %}
 
 networks:
   {{ iroha_network_name }}:
