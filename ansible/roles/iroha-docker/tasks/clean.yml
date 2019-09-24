@@ -13,3 +13,10 @@
     path: "{{ iroha_deploy_dir }}"
   when: iroha_forced_cleaning
   tags: ["iroha-docker", "iroha-clean"]
+
+- name: Delete volume dir
+  file:
+    state: absent
+    path: "{{ iroha_volume_dir }}"
+  when: iroha_forced_cleaning and iroha_volume_dir != ""
+  tags: ["iroha-docker", "iroha-clean"]
