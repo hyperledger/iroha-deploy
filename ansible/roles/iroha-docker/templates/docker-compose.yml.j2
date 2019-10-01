@@ -70,7 +70,7 @@ services:
     command: {{ iroha_postgres_commands }}
 {% endif %}
 
-{% if iroha_volume_dir == "" %}
+{% if not iroha_volume_dir %}
 volumes:
 {% for node in iroha_nodes %}
   iroha_block_store-{{ node.human_hostname }}:
