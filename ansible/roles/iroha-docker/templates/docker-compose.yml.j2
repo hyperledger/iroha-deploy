@@ -1,3 +1,6 @@
+{% if iroha_volume_dir -%}
+  {% set iroha_volume_dir = (iroha_volume_dir + "/") | dirname + "/" %}
+{% endif -%}
 version: "2.4"
 
 services:
