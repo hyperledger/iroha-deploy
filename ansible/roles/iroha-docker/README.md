@@ -1,5 +1,5 @@
 # Description
-[This role](https://github.com/hyperledger/iroha/tree/master/deploy/ansible/roles/iroha-docker) deploys multiple replicas of Iroha containers (one Iroha peer per container) on remote hosts. Each Iroha peer can communicate with others in two ways:
+[This role](https://github.com/hyperledger/iroha-deploy/edit/master/ansible/roles/iroha-docker) deploys multiple replicas of Iroha containers (one Iroha peer per container) on remote hosts. Each Iroha peer can communicate with others in two ways:
   - using public IP addresses or hostnames set in inventory list OR
   - using private IP addresses of the Docker overlay network
 
