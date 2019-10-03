@@ -31,20 +31,13 @@ This method is also suitable for local-only deployments and does not require any
     ```
     pip3 install ansible
     ```
-2. Create inventory list containing IP address of the remote host
+2. Run ansible 
 
-    **iroha.list**
     ```
-    [all]
-    192.168.122.109
+    cd ../../ && ansible-playbook -b -e 'ansible_ssh_user=ubuntu' -i '192.168.122.109,' playbooks/iroha-docker/main.yml`
     ```
 
-    Put this file into `../../inventory/` directory.
-
-`cd ../../ && ansible-playbook -b -e 'ansible_ssh_user=ubuntu' -e 'iroha_service_host=True' -i inventory/iroha.list playbooks/iroha-docker/main.yml`
-
-This will deploy 4 Iroha Docker containers along with one Postgres containers on the remote host specified in `iroha.list` file. Remote user is `ubuntu`. Torii port of each container is exposed on the host. Iroha peer can be communicated over port defined in `iroha_torii_port` variable (50051 by default). Overall, each host will listen the following port range: `iroha_torii_port` ... `iroha_torii_port` + *number-of-containers* - 1.
-It will also install Docker along with required python modules. If you want to skip this step, comment out `docker` role in the playbook (`playbooks/iroha-docker/main.yml`)
+This will deploy 4 Iroha Docker containers along with one Postgres containers on the remote host specified in `-i`. Remote user is `ubuntu`. Torii port of each container is exposed on the host. Iroha peer can be communicated over port defined in `iroha_torii_port` variable (50051 by default). Overall, each host will listen the following port range: `iroha_torii_port` ... `iroha_torii_port` + *number-of-containers* - 1.
 
 **Note:**
 > This command escalates privileges on a remote host during the run. It is required to be able to spin up Docker containers. We recommend to run the playbook using a passwordless remote sudo user.
@@ -56,6 +49,25 @@ See `defaults/main.yml` file to get more details about available configuration o
 # Examples
 **Example 1**
 <!-- TODO: Cover more example cases -->
+Deploying Iroha to localhost with default number of replica: 
+1. run ansible command:
+
+    ```
+    cd ../../ && ansible-playbook -e 'iroha_network=internal' -c local  -i 'localhost,' playbooks/iroha-docker/main.yml -b -K`
+    ```
+    `-K` - parameter will ask you for sudo password: 
+    ```
+    BECOME password: 
+    ```
+
+This will deploy 4 Iroha Docker containers along with one Postgres containers on the local host. 
+Torii port of each container is exposed on the host. 
+Iroha peer can be communicated over port defined in `iroha_torii_port` variable (50051 by default). 
+Overall, each host will listen the following port range: `iroha_torii_port` ... `iroha_torii_port` + *number-of-containers* - 1.
+Iroha peer will communicate with each over through docker network. And will use docker container name for it. 
+
+**Example 2**
+
 Deploying 6 Iroha peers on two remote hosts communicating using public IP addresses. With 2 and 4 replicas on each host respectively.
 
 1. Create inventory list containing IP addresses (or hostnames if they are mutually resolve-able on both hosts) of two hosts that will run Iroha peers
@@ -93,7 +105,7 @@ Deploying 6 Iroha peers on two remote hosts communicating using public IP addres
 ```
 ansible-playbook -i inventory/iroha.list -b playbooks/iroha-docker/main.yml
 ```
-**Example 2**
+**Example 3**
 Deploying 3 Iroha peers on two remote hosts communicating using DNS name. With 2 and 1 replicas on each host respectively.
 We will use pivate ip (`192.168.122.109, 192.168.122.30`) to connect and deploy Iroha and we will use DNS name (`iroha[1-3].example.com`) to communicate between peers.
 
@@ -137,7 +149,7 @@ We will use pivate ip (`192.168.122.109, 192.168.122.30`) to connect and deploy 
 ansible-playbook -i inventory/iroha.list -b playbooks/iroha-docker/main.yml
 ```
 
-**Example 3**
+**Example 4**
 Deploying 6 Iroha peers on two remote hosts communicating over overlay network (Calico) using custom hostnames.
 
 **TBD**

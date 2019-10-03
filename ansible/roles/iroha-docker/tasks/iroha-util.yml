@@ -2,9 +2,13 @@
 
   - name: Set iroha_command_host variable
     set_fact:
-      iroha_command_host: "{{ item.key }}"
-    when: item.value.iroha_service_host is defined and item.value.iroha_service_host
-    loop: "{{hostvars | dict2items }}"
+      iroha_command_host: "{% set output = {'host': inventory_hostname }  %}\
+                              {% for key, value in hostvars.items() | sort %}\
+                                 {% if value.iroha_service_host is defined and value.iroha_service_host %}\
+                                   {% set _ = output.update({'host': key}) %}\
+                                {% endif %}\
+                              {% endfor %}\
+                           {{ output.host }}"
     delegate_to: localhost
     run_once: yes
     become: no

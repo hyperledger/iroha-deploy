@@ -1,3 +1,4 @@
+{# add '/' to end of path #}
 {% if iroha_volume_dir -%}
   {% set iroha_volume_dir = (iroha_volume_dir + "/") | dirname + "/" %}
 {% endif -%}
