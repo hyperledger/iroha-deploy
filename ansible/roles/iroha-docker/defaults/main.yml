@@ -121,7 +121,7 @@ iroha_peer_keys_ansible_encrypt_password_file: ''
 # You can find example private keys for accounts in https://github.com/hyperledger/iroha/tree/master/example
 iroha_genesis_block: '
   {
-    "block_v1":{
+    "blockV1":{
       "payload":{
         "height":"1",
         "prevBlockHash":"0000000000000000000000000000000000000000000000000000000000000000",
