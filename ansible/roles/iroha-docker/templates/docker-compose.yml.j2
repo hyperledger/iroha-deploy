@@ -28,7 +28,7 @@ services:
 {% endfor %}
 {% if iroha_docker_labels %}
     labels:
-{% for label in iroha_docker_labels.items() %}
+{% for label in iroha_docker_labels.items() | sort %}
       - "{{ label[0] }}={{ label[1] }}"
 {% endfor %}
 {% endif %}
@@ -59,9 +59,9 @@ services:
       POSTGRES_PASSWORD: {{ iroha_postgres_password }}
     expose:
       - {{ iroha_postgres_port }}
-{% if postgres_docker_labels %}
+{% if iroha_postgres_docker_labels %}
     labels:
-{% for label in postgres_docker_labels.items() %}
+{% for label in iroha_postgres_docker_labels.items() | sort %}
       - "{{ label[0] }}={{ label[1] }}"
 {% endfor %}
 {% endif %}
