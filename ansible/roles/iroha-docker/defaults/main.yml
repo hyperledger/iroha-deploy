@@ -75,6 +75,22 @@ iroha_blockstore_path: /tmp/block_store
 #iroha_mst_expiration_time: 1440
 #iroha_max_rounds_delay: 3000
 #iroha_stale_stream_max_rounds: 2
+#iroha_custom_config_params: '
+#"log": {
+#  "level": "info",
+#  "children": {
+#    "Irohad": {
+#      "children": {
+#        "Consensus": {
+#          "level": "warning"
+#        },
+#        "Synchronizer": {
+#          "level": "warning"
+#        }
+#      }
+#    }
+#  }
+#}'
 
 ## Custom Docker configuration
 # Docker container environment variables
@@ -82,7 +98,7 @@ iroha_docker_env_variables: {}
 # Docker iroha container labels
 iroha_docker_labels: {}
 # Docker postgres container labels
-postgres_docker_labels: {}
+iroha_postgres_docker_labels: {}
 
 ## Iroha logging
 # Maximum docker log file size

@@ -19,6 +19,11 @@
       msg: "You can not use iroha_network == 'internal' if you have more than one host"
     when: iroha_network == 'internal' and ansible_play_hosts | length > 1
 
+  - name: check | check postgres_docker_labels
+    fail:
+      msg: "postgres_docker_labels is deprecated use: 'iroha_postgres_docker_labels'"
+    when: postgres_docker_labels  is defined
+
   - name: Check | Stop playbook if one host fail
     meta: end_play
     when: ansible_play_hosts_all != ansible_play_hosts

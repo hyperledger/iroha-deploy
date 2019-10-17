@@ -24,4 +24,7 @@
 {% if iroha_stale_stream_max_rounds is defined %}
   ,"stale_stream_max_rounds": {{ iroha_stale_stream_max_rounds }}
 {% endif %}
+{% if iroha_custom_config_params is defined %}
+  ,{{ iroha_custom_config_params }}
+{% endif %}
 }
