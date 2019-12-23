@@ -34,7 +34,7 @@
   - name: Add node
     docker_container:
       name: "iroha_command"
-      image: "iroha-docker-iroha-python"
+      image: "{{ iroha_util_docker_image }}"
       recreate: yes
       detach: no
       cleanup: yes
