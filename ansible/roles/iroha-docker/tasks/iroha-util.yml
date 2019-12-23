@@ -37,7 +37,7 @@
 
   - name: Build docker image for iroha-python util
     docker_image:
-      name: "iroha-docker-iroha-python"
+      name: "{{ iroha_util_docker_image }}"
       build:
         path: "{{ iroha_deploy_dir }}"
         dockerfile: "Dockerfile_iroha_python"
@@ -46,5 +46,5 @@
       force_source: yes
     delegate_to: "{{ iroha_command_host }}"
     run_once: yes
-
+    when: not iroha_util_custom_image
   tags: ["iroha-docker", "iroha-util"]

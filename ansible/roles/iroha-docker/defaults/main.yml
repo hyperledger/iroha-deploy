@@ -49,6 +49,11 @@ iroha_docker_tag: '1.1.0'
 iroha_postgres_docker_image: 'postgres' 
 iroha_postgres_docker_tag: '9.5'
 
+# Iroha-utils docker image variables 
+iroha_util_docker_image: 'iroha-docker-iroha-python'
+# Set to `true` to disable building iroha utils
+iroha_util_custom_image: false
+
 ## Iroha config
 # This value will be used as a base peer port for Iroha container. E.g. setting `iroha_replicas` option to
 # 6 will generate Docker Compose file with port numbers starting from 10001 counting up to 10006.
@@ -71,6 +76,7 @@ iroha_postgres_user: postgres
 iroha_postgres_password: postgres
 iroha_postgres_host: iroha-postgres
 iroha_postgres_port: 5432
+# set it to empty line (e.g "") to use postgres instead of files for storing blocks (iroha 1.2.0+)
 iroha_blockstore_path: /tmp/block_store
 #iroha_mst_expiration_time: 1440
 #iroha_max_rounds_delay: 3000
