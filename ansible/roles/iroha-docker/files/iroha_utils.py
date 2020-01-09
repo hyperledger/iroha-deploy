@@ -74,7 +74,7 @@ def add_peer_tx(peer_host, peer_key):
 
 def get_block(block_num):
     ir = iroha.Iroha(params['iroha_account'])
-    query = iroha.IrohaCrypto.sign_query(ir.query('GetBlock', height=block_num), *params['iroha_account_keys'])
+    query = iroha.IrohaCrypto.sign_query(ir.query('GetBlock', height=block_num), params['iroha_account_keys'][0])
     return query
 
 
