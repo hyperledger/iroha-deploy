@@ -11,7 +11,7 @@
       - name: Get existing genesis block 1
         docker_container:
           name: "iroha_command"
-          image: "iroha-docker-iroha-python"
+          image: "{{ iroha_util_docker_image }}"
           recreate: yes
           detach: no
           cleanup: yes
@@ -36,28 +36,26 @@
 
   - block:
 
-      - name: Generate genesis.block 1
-        set_fact:
-          iroha_new_genesis_block: "{{ iroha_genesis_block | from_json }}"
+      - name: Format existing genesis block
+        docker_container:
+          image: "{{ iroha_util_docker_image }}"
+          name: "iroha_command"
+          recreate: yes
+          detach: no
+          cleanup: yes
+          command:
+            - "generate_genesis"
+            # Double conversion to ensure a good JSON format
+            - "{{ iroha_genesis_block | from_json | to_json | b64encode }}"
+            - "{{ iroha_all_new_nodes | to_json | b64encode }}"
+        register: iroha_command_register
 
-      - name: Generate genesis.block 2
+      - name: Register new genesis block
         set_fact:
-          iroha_genesis_block_commands: "{{ (iroha_genesis_block_commands | default([])) + [item] }}"
-        loop: "{{ iroha_new_genesis_block['block_v1']['payload']['transactions'][0]['payload']['reducedPayload']['commands'] }}"
-        when: '"addPeer" not in item'
+          iroha_new_genesis_block: "{{ (iroha_command_register.ansible_facts.docker_container.Output | from_json).result }}"
 
-      - name: Generate genesis.block 3
-        set_fact:
-          iroha_genesis_block_commands: "{{ iroha_genesis_block_commands + [{'addPeer': {'peer': {'address': item.hostname, 'peerKey': item.pub_key}}}] }}"
-        loop: "{{ iroha_all_new_nodes }}"
-
-      - name: Generate genesis.block 4
-        set_fact:
-          iroha_new_genesis_block: "{{ iroha_new_genesis_block | combine({'block_v1': {'payload': {'transactions': [{'payload': {'reducedPayload': {'commands': iroha_genesis_block_commands}}}]}}}, recursive=True) }}"
-
-    delegate_to: localhost
+    delegate_to: "{{ iroha_command_host }}"
     run_once: yes
-    become: no
     when: not node_change and iroha_all_new_nodes
 
   - name: Debug

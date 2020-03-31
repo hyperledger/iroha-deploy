@@ -67,7 +67,7 @@
 - name: Generate peer keys
   docker_container:
     name: "iroha_command_{{ 999999 | random }}"
-    image: "iroha-docker-iroha-python"
+    image: "{{ iroha_util_docker_image }}"
     recreate: yes
     detach: no
     cleanup: yes
@@ -90,7 +90,7 @@
   - name: Encrypt peer keys
     docker_container:
       name: "iroha_command_{{ 999999 | random }}"
-      image: "iroha-docker-iroha-python"
+      image: "{{ iroha_util_docker_image }}"
       recreate: yes
       detach: no
       cleanup: yes
