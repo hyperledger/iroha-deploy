@@ -49,6 +49,9 @@ services:
     mem_limit: "{{ iroha_docker_mem_limit }}"
 {% endif %}
     restart: always
+{% if iroha_docker_commands is defined %}
+    command: {{ iroha_docker_commands }}
+{% endif %}
 
 {% endfor %}
 
