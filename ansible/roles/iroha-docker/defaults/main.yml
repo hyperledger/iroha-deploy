@@ -68,6 +68,7 @@ iroha_torii_port: 50051
 # Enables 2 phase commit optimization. Postgres documentation suggests setting it to a max number of
 # connections, which is 100 by default
 iroha_postgres_commands: '-c max_prepared_transactions=100'
+
 # Rest of the options affect Iroha configuration
 # See https://iroha.readthedocs.io/en/latest/guides/configuration.html#configuration
 # for more info.
