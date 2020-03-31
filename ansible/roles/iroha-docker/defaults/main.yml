@@ -46,6 +46,10 @@ iroha_docker_image_pull: true
 iroha_docker_image: 'hyperledger/iroha'
 iroha_docker_tag: '1.1.0'
 
+# # Use this parameter to start Iroha without hash calculating
+# iroha_docker_commands: '--reuse_state'
+
+
 iroha_postgres_docker_image: 'postgres' 
 iroha_postgres_docker_tag: '9.5'
 
@@ -64,7 +68,6 @@ iroha_torii_port: 50051
 # Enables 2 phase commit optimization. Postgres documentation suggests setting it to a max number of
 # connections, which is 100 by default
 iroha_postgres_commands: '-c max_prepared_transactions=100'
-
 # Rest of the options affect Iroha configuration
 # See https://iroha.readthedocs.io/en/latest/guides/configuration.html#configuration
 # for more info.
