@@ -46,7 +46,8 @@ iroha_docker_image_pull: true
 iroha_docker_image: 'hyperledger/iroha'
 iroha_docker_tag: '1.1.0'
 
-# # Use this parameter to start Iroha without hash calculating
+# Use this parameter to start Iroha with additional command line option.
+# Example, enabling WSV Reuse:
 # iroha_docker_commands: '--reuse_state'
 
 
