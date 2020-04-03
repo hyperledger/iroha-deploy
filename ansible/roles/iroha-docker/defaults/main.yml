@@ -48,7 +48,8 @@ iroha_docker_tag: '1.1.0'
 
 # Use this parameter to start Iroha with additional command line option.
 # Example, enabling WSV Reuse:
-# iroha_docker_commands: '--reuse_state'
+# iroha_docker_commands:
+#  - '--reuse_state'
 
 
 iroha_postgres_docker_image: 'postgres' 
