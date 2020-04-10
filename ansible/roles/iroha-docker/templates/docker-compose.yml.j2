@@ -52,7 +52,7 @@ services:
 {% endif %}
     restart: always
 {% if iroha_docker_commands is defined %}
-    command: {{ iroha_docker_commands }}
+    command: {{ iroha_docker_commands | to_json }}
 {% endif %}
 
 {% endfor %}
@@ -82,7 +82,7 @@ services:
       - iroha-db-net
     restart: always
 {% if iroha_postgres_commands is defined %}
-    command: {{ iroha_postgres_commands }}
+    command: {{ iroha_postgres_commands | to_json }}
 {% endif %}
 
 {% if not iroha_volume_dir %}
