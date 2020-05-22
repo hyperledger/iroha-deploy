@@ -35,9 +35,11 @@
 
   - debug:
       var: iroha_peers_map
+    tags: ["never"]
 
   - debug:
       var: iroha_inventory_human_hostname
+    tags: ["never"]
 
   - set_fact:
       iroha_nodes: "{{ iroha_peers_map }}"
@@ -79,6 +81,7 @@
       debug:
         var: iroha_all_new_nodes
       run_once: yes
+      tags: [ "never"]
 
     - name: Set iroha_old_nodes variable
       set_fact:
@@ -86,7 +89,8 @@
 
     - name: Set node_change variable
       set_fact:
-        node_change: "{{ iroha_all_new_nodes and (( iroha_all_new_nodes | length ) < ( iroha_all_nodes | length )) }}"
+        # if we have new node and this is not first deploy
+        node_change: "{{ (iroha_all_new_nodes | length > 0 ) and (( iroha_all_new_nodes | length ) < ( iroha_all_nodes | length ))  }}"
       run_once: yes
 
   become: no

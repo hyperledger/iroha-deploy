@@ -58,12 +58,12 @@
     run_once: yes
     when: not node_change and iroha_all_new_nodes
 
-  - name: Debug
-    debug:
+  - debug:
       var: iroha_new_genesis_block
     run_once: yes
     become: no
     delegate_to: localhost
+    tags: ["never"]
 
   - name: Move genesis.block
     copy:

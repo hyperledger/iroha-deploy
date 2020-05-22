@@ -26,6 +26,10 @@
     loop: "{{ iroha_nodes }}"
     tags: ["iroha-deploy"]
 
+  - name: Flush handlers befor service start
+    meta: flush_handlers
+    tags: ["iroha-deploy"]
+
   - name: Run Iroha
     docker_compose:
       project_src: "{{ iroha_deploy_dir }}"
