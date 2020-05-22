@@ -52,7 +52,7 @@ services:
 {% endif %}
     restart: always
 {% if iroha_docker_commands is defined %}
-    # Only JSON notation for commands can work in docker-compose
+    {#- Only JSON notation for commands can work in docker-compose #}
     command: {{ iroha_docker_commands | to_json }}
 {% endif %}
 
@@ -83,7 +83,7 @@ services:
       - iroha-db-net
     restart: always
 {% if iroha_postgres_commands is defined %}
-    # Only JSON notation for commands can work in docker-compose
+    {#- Only JSON notation for commands can work in docker-compose #}
     command: {{ iroha_postgres_commands | to_json }}
 {% endif %}
 

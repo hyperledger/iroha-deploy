@@ -21,6 +21,7 @@
    var: iroha_peer_keys_from_file
   when: iroha_peer_keys_from_file is defined
   run_once: yes
+  tags: [ "never"]
 
 - name: Set init value for 'iroha_new_peer_keys', 'iroha_new_peer_keys_encrypt' and 'iroha_invalid_peer_list' variables
   set_fact:
@@ -40,6 +41,7 @@
 
 - debug:
     var: iroha_invalid_peer_list
+  tags: ["never"]
 
 - name: Set iroha_invalid_peer variable
   set_fact:
