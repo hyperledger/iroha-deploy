@@ -42,6 +42,9 @@ services:
     networks:
       - {{ iroha_network_name }}
       - iroha-db-net
+{% for net in iroha_additional_docker_networks %}
+      - {{ net }}
+{%endfor%}
     logging:
       driver: "json-file"
       options:
@@ -81,6 +84,9 @@ services:
       - {{ iroha_volume_dir }}psql_storage-{{ iroha_inventory_human_hostname }}:/var/lib/postgresql/data
     networks:
       - iroha-db-net
+{% for net in iroha_postgres_additional_docker_networks %}
+      - {{ net }}
+{%endfor%}
     restart: always
 {% if iroha_postgres_commands is defined %}
     {#- Only JSON notation for commands can work in docker-compose #}
@@ -103,3 +109,8 @@ networks:
       name: {{ iroha_network_name }}
   iroha-db-net:
     name: iroha-db-net
+{% for net in ( iroha_additional_docker_networks | union(iroha_postgres_additional_docker_networks) ) %}
+  {{ net }}:
+    external:
+      name: {{ net }}
+{%endfor%}
