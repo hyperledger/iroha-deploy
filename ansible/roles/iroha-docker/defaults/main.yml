@@ -31,6 +31,10 @@ iroha_network_name: iroha-net
 # Overlay network settings
 iroha_network_address: '10.10.111.0/24'
 iroha_network_gateway: '10.10.111.1'
+# If you want to connect Iroha to already existing docker network
+# set name of network to this variable
+# docker network should be created befog staring Iroha docker
+iroha_additional_docker_networks: []
 
 ## Deployment configs
 iroha_container_basename: iroha
@@ -54,6 +58,12 @@ iroha_docker_tag: '1.1.0'
 
 iroha_postgres_docker_image: 'postgres' 
 iroha_postgres_docker_tag: '9.5'
+
+# Role will create iroha-db-net to connect postgres and Iroha,
+# depend on you case you may need to connect to iroha postgres from different container.
+# you can set this variable to connect Iroha postgres to external docker network
+# docker network should be created befog staring Iroha docker
+iroha_postgres_additional_docker_networks: []
 
 # Iroha-utils docker image variables 
 iroha_util_docker_image: 'iroha-docker-iroha-python'
