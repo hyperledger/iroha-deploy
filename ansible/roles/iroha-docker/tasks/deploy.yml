@@ -15,6 +15,9 @@
     template:
       src: docker-compose.yml.j2
       dest: "{{ iroha_deploy_dir }}/docker-compose.yml"
+    # restart all services, (Iroha has undetermined behavior if Postgres restarts)
+    # TODO remove it after Iroha fixed
+    notify: restart Iroha
     tags: ["iroha-deploy"]
 
   - name: Generate config files
