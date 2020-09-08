@@ -19,7 +19,7 @@ iroha_forced_cleaning: False
 iroha_custom_hostnames: false
 
 # Affects how Iroha peers are communicated.
-# If set to `internal` Iroha will use docker bridge network to communicate between nodes. You can only use this mode if you want to deploy all nodes on one host  
+# If set to `internal` Iroha will use docker bridge network to communicate between nodes. You can only use this mode if you want to deploy all nodes on one host
 # If set to `overlay` Iroha will create a docker overlay network to communicate between node. Overlay network plugin (like Calico) or docker swarm should be enabled on all host.
 # If set to `external` Iroha will map the port to host system and will use it to communicate.
 #
@@ -56,7 +56,7 @@ iroha_docker_tag: '1.1.0'
 #  - '--reuse_state'
 
 
-iroha_postgres_docker_image: 'postgres' 
+iroha_postgres_docker_image: 'postgres'
 iroha_postgres_docker_tag: '9.5'
 
 # Role will create iroha-db-net to connect postgres and Iroha,
@@ -65,7 +65,7 @@ iroha_postgres_docker_tag: '9.5'
 # docker network should be created befog staring Iroha docker
 iroha_postgres_additional_docker_networks: []
 
-# Iroha-utils docker image variables 
+# Iroha-utils docker image variables
 iroha_util_docker_image: 'iroha-docker-iroha-python'
 # Set to `true` to disable building iroha utils
 iroha_util_custom_image: false
@@ -119,6 +119,10 @@ iroha_blockstore_path: /tmp/block_store
 iroha_docker_env_variables: {}
 # Docker iroha container labels
 iroha_docker_labels: {}
+# Docker iroha container added capabilities
+iroha_docker_cap_add: []
+# Docker iroha container labeling scheme
+iroha_docker_security_opt: []
 # Docker postgres container labels
 iroha_postgres_docker_labels: {}
 

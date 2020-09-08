@@ -58,6 +58,18 @@ services:
     {#- Only JSON notation for commands can work in docker-compose #}
     command: {{ iroha_docker_commands | to_json }}
 {% endif %}
+{% if iroha_docker_cap_add %}
+    cap_add:
+{% for cap in iroha_docker_cap_add %}
+      - {{ cap }}
+{%endfor%}
+{% endif %}
+{% if iroha_docker_security_opt %}
+    security_opt:
+{% for opt in iroha_docker_security_opt %}
+      - {{ opt }}
+{%endfor%}
+{% endif %}
 
 {% endfor %}
 
