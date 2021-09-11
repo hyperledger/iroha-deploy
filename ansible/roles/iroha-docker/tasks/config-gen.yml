@@ -49,10 +49,11 @@
             - "{{ iroha_genesis_block | from_json | to_json | b64encode }}"
             - "{{ iroha_all_new_nodes | to_json | b64encode }}"
         register: iroha_command_register
-
+        
+        
       - name: Register new genesis block
         set_fact:
-          iroha_new_genesis_block: "{{ (iroha_command_register.ansible_facts.docker_container.Output | from_json).result }}"
+          iroha_new_genesis_block: "{{ (iroha_command_register.container.Output | from_json).result }}"
 
     delegate_to: "{{ iroha_command_host }}"
     run_once: yes

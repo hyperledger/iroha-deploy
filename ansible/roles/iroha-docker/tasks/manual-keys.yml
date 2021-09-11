@@ -71,18 +71,18 @@
     name: "iroha_command_{{ 999999 | random }}"
     image: "{{ iroha_util_docker_image }}"
     recreate: yes
-    detach: no
+    detach: false
     cleanup: yes
-    command:
-      - "gen_keys {{ iroha_invalid_peer_list | length }}"
+    command: "gen_keys {{ iroha_invalid_peer_list | length }}"
   when: iroha_invalid_peer_list | length > 0
   register: iroha_command_register
   delegate_to: "{{ iroha_command_host }}"
   become: yes
 
+
 - name: Attach new peer keys
   set_fact:
-    iroha_new_peer_keys: "{{ iroha_new_peer_keys | combine({item: (iroha_command_register.ansible_facts.docker_container.Output | from_json)['result'][ansible_loop.index0]}, recursive=True) }}"
+    iroha_new_peer_keys: "{{ iroha_new_peer_keys | combine({item: (iroha_command_register.container.Output | from_json)['result'][ansible_loop.index0]}, recursive=True) }}"
   loop: "{{ iroha_invalid_peer_list }}"
   loop_control:
      extended: yes
