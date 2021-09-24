@@ -24,8 +24,13 @@
       msg: "postgres_docker_labels is deprecated use: 'iroha_postgres_docker_labels'"
     when: postgres_docker_labels  is defined
 
-  - name: Check | Stop playbook if one host fail
+  - name: check | Stop playbook if one host fail
     meta: end_play
     when: ansible_play_hosts_all != ansible_play_hosts
+    
+  - name: check | Check Ansible version
+    fail:
+      msg: "Your Ansible version is incorrect. Please use Ansible version >=2.9.x"
+    when: ansible_version.full is version('2.9', '<')
 
   tags: ["iroha-docker", "iroha-check"]
