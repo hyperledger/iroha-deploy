@@ -2,7 +2,7 @@ FROM python:3.7-slim-stretch
 
 WORKDIR /opt/app
 
-RUN pip3 install iroha==0.0.5.4 ansible==2.8.3
+RUN pip3 install iroha==1.0.0 ansible==2.10.7
 
 COPY iroha_utils.py iroha_utils.py
 
