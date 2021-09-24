@@ -72,6 +72,12 @@ def add_peer_tx(peer_host, peer_key):
     return tx
 
 
+def remove_peer_tx(peer_key):
+    ir = iroha.Iroha(params['iroha_account'])
+    tx = ir.transaction([ ir.command('RemovePeer', public_key=peer_key) ])
+    iroha.IrohaCrypto.sign_transaction(tx, *params['iroha_account_keys'])
+    return tx
+
 def get_block(block_num):
     ir = iroha.Iroha(params['iroha_account'])
     query = iroha.IrohaCrypto.sign_query(ir.query('GetBlock', height=block_num), params['iroha_account_keys'][0])
@@ -89,6 +95,11 @@ def get_genesis_block():
 
 def add_peer(peer_host, peer_pub_key):
     tx = add_peer_tx(peer_host, peer_pub_key)
+    return(send_transaction(tx))
+
+
+def remove_peer(peer_pub_key):
+    tx = remove_peer_tx(peer_pub_key)
     return(send_transaction(tx))
 
 
@@ -176,6 +187,13 @@ if __name__ == "__main__":
             peer_host = sys.argv[2]
             peer_pub_key = sys.argv[3]
             if add_peer(peer_host, peer_pub_key):
+                exit_and_result(0)
+            else:
+                exit_and_result(1, "Command failed")
+        elif command == 'remove_peer' and len(sys.argv) == 3:
+            init_params()
+            peer_pub_key = sys.argv[2]
+            if remove_peer(peer_pub_key):
                 exit_and_result(0)
             else:
                 exit_and_result(1, "Command failed")
