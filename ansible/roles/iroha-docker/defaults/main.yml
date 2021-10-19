@@ -94,8 +94,10 @@ iroha_postgres_host: iroha-postgres
 iroha_postgres_port: 5432
 # set it to empty line (e.g "") to use postgres instead of files for storing blocks (iroha 1.2.0+)
 iroha_blockstore_path: /tmp/block_store
+iroha_rdb_data_path: /tmp/rdb
 #iroha_mst_expiration_time: 1440
 #iroha_max_rounds_delay: 3000
+#proposal_creation_timeout: 3000
 #iroha_stale_stream_max_rounds: 2
 #iroha_custom_config_params: '
 #"log": {
@@ -149,6 +151,8 @@ iroha_service_host: False
 iroha_service_account: ''
 #  The number of keys must match the quorum settings
 iroha_service_account_keys: []
+iroha_new_database_config: False
+iroha_use_rdb: False
 
 ## Iroha peer keys
 # Role will store automatically generated peer keys in this file:
