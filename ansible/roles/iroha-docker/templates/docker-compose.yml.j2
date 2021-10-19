@@ -36,6 +36,9 @@ services:
 {% if iroha_blockstore_path  %}
       - {{ iroha_volume_dir }}iroha_block_store-{{ node.human_hostname }}:{{ iroha_blockstore_path }}
 {% endif %}
+{% if iroha_use_rdb %}
+      - {{ iroha_volume_dir }}iroha_rdb_data-{{ node.human_hostname }}:{{ iroha_rdb_data_path }}
+{% endif %}
       - ./conf/{{ node.human_hostname }}:/opt/iroha_data
     depends_on:
       - {{ iroha_inventory_human_hostname }}-postgres
@@ -54,6 +57,9 @@ services:
     mem_limit: "{{ iroha_docker_mem_limit }}"
 {% endif %}
     restart: always
+{% if iroha_docker_priviledged is defined %}
+    privileged: true
+{% endif %}
 {% if iroha_docker_commands is defined %}
     {#- Only JSON notation for commands can work in docker-compose #}
     command: {{ iroha_docker_commands | to_json }}
@@ -110,6 +116,11 @@ volumes:
 {% if iroha_blockstore_path %}
 {% for node in iroha_nodes %}
   iroha_block_store-{{ node.human_hostname }}:
+{% endfor %}
+{% endif %}
+{% if iroha_use_rdb %}
+{% for node in iroha_nodes %}
+  iroha_rdb_data-{{ node.human_hostname }}:
 {% endfor %}
 {% endif %}
   psql_storage-{{ iroha_inventory_human_hostname }}:
