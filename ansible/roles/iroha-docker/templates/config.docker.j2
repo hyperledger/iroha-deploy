@@ -17,16 +17,16 @@
   "database": {
 {% if iroha_use_rdb %}
     "type":"rocksdb",
-    "path":"{{ iroha_rdb_data_path }}",
+    "path":"{{ iroha_rdb_data_path }}"
 {% else %}
     "type":"postgres",
-{% endif %}
     "host": "{{ iroha_inventory_human_hostname }}-postgres",
     "port": {{ iroha_postgres_port }},
     "user": "{{ iroha_postgres_user }}",
     "password": "{{ iroha_postgres_password }}",
     "working database": "{{ item.human_hostname }}",
     "maintenance database": "postgres"
+{% endif %}
   },
 {% else %}
   "pg_opt" : "host={{ iroha_inventory_human_hostname }}-postgres port={{ iroha_postgres_port }} user={{ iroha_postgres_user }} password={{ iroha_postgres_password }} dbname={{ item.human_hostname }}",
