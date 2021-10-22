@@ -22,7 +22,9 @@ services:
 {% endif %}
     environment:
       - "KEY={{ node.hostname }}"
+{% if not iroha_use_rdb %}
       - "IROHA_POSTGRES_HOST={{ iroha_inventory_human_hostname }}-postgres"
+{% endif %}
 {% for env_variable in iroha_docker_env_variables.items() %}
       - "{{ env_variable[0] }}={{ env_variable[1] }}"
 {% endfor %}
@@ -40,11 +42,15 @@ services:
       - {{ iroha_volume_dir }}iroha_rdb_data-{{ node.human_hostname }}:{{ iroha_rdb_data_path }}
 {% endif %}
       - ./conf/{{ node.human_hostname }}:/opt/iroha_data
+{% if not iroha_use_rdb %}
     depends_on:
       - {{ iroha_inventory_human_hostname }}-postgres
+{% endif %}
     networks:
       - {{ iroha_network_name }}
+{% if not iroha_use_rdb %}
       - iroha-db-net
+{% endif %}
 {% for net in iroha_additional_docker_networks %}
       - {{ net }}
 {%endfor%}
@@ -79,6 +85,7 @@ services:
 
 {% endfor %}
 
+{% if not iroha_use_rdb %}
   {{ iroha_inventory_human_hostname }}-postgres:
     image: {{ iroha_postgres_docker_image }}:{{ iroha_postgres_docker_tag }}
     container_name: {{ iroha_inventory_human_hostname }}-postgres
@@ -111,6 +118,8 @@ services:
     command: {{ iroha_postgres_commands | to_json }}
 {% endif %}
 
+{% endif %}
+
 {% if not iroha_volume_dir %}
 volumes:
 {% if iroha_blockstore_path %}
@@ -123,15 +132,19 @@ volumes:
   iroha_rdb_data-{{ node.human_hostname }}:
 {% endfor %}
 {% endif %}
+{% if not iroha_use_rdb %}
   psql_storage-{{ iroha_inventory_human_hostname }}:
+{% endif %}
 {% endif %}
 
 networks:
   {{ iroha_network_name }}:
     external:
       name: {{ iroha_network_name }}
+{% if not iroha_use_rdb %}
   iroha-db-net:
     name: iroha-db-net
+{% endif %}
 {% for net in ( iroha_additional_docker_networks | union(iroha_postgres_additional_docker_networks) ) %}
   {{ net }}:
     external:
