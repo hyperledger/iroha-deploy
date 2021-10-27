@@ -29,7 +29,7 @@
     - name: Check if new configuration is rdb
       fail:
         msg: "iroha_new_database_config and iroha_use_rdb should be True"
-      when: "{{ iroha_new_database_config and iroha_use_rdb }}"
+      when: "{{ not (iroha_new_database_config and iroha_use_rdb) }}"
 
     - name: Remove iroha containers
       docker_container:
@@ -50,5 +50,29 @@
         dest: "{{ iroha_deploy_dir }}/conf/{{ item.human_hostname }}/config.docker"
       loop: "{{ iroha_nodes }}"
       tags: ["migrate-rdb"]
+
+    - name: Generate migration script
+      template:
+        src: migrate.sh.j2
+        dest: "{{ iroha_deploy_dir }}/migrate.sh"
+      tags: ["migrate-rdb"]
+
+    - name: deploy docker compose
+      docker_compose:
+        project_src: "{{ iroha_deploy_dir }}"
+        files:
+        - docker-compose.yml
+      tags: ["migrate-rdb"]
+
+    - name: copy migration script to containers
+      shell: docker cp "{{ iroha_deploy_dir }}/migrate.sh" "{{ item.hostname[:item.hostname.rfind(':')] }}:/tmp/migrate.sh"
+      loop: "{{ iroha_old_nodes }}"
+      tags: ["migrate-rdb"]
+
+    - name: run migration script
+      shell: docker exec "{{ item.hostname[:item.hostname.rfind(':')] }}" "/tmp/migrate.sh"
+      loop: "{{ iroha_old_nodes }}"
+      tags: ["migrate-rdb"]
+
 
   when: migrate_rdb is defined and migrate_rdb
