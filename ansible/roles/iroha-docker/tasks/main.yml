@@ -13,5 +13,8 @@
 - name: generate Iroha configs
   include: config-gen.yml
 
+- name: Migrate rdb
+  include: migrate-rdb.yml
+
 - name: deploy Iroha
   include: deploy.yml
