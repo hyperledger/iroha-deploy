@@ -1,0 +1,54 @@
+- name: task1
+  block:
+
+    - name: Check if postgres container exists #returns error if not
+      shell: docker inspect --format={{ '{{.State.Running}}' }} "{{ iroha_inventory_human_hostname }}-postgres"
+      register: postgres_state
+      tags: ["migrate-rdb"]
+
+    - name: Check if postgres container is running
+      fail:
+        msg: "Container {{ iroha_inventory_human_hostname }}-postgres should be running"
+      when: postgres_state.stdout != "true"
+      tags: ["migrate-rdb"]
+
+    - name: Check if iroha containers exist #returns error if not
+      shell: docker inspect --format={{ '{{.State.Running}}' }} "{{ item.hostname[:item.hostname.rfind(':')] }}"
+      register: iroha_state
+      loop: "{{ iroha_old_nodes }}"
+      tags: ["migrate-rdb"]
+
+    - name: Check if iroha containers are running
+      fail:
+        #msg: "Container {{ item.hostname[:item.hostname.rfind(':')] }} should be running"
+        msg: "Container {{item.item.hostname[:item.item.hostname.rfind(':')]}} should be running"
+      when: item.stdout != "true"
+      loop: "{{ iroha_state.results }}"
+      tags: ["migrate-rdb"]
+
+    - name: Check if new configuration is rdb
+      fail:
+        msg: "iroha_new_database_config and iroha_use_rdb should be True"
+      when: "{{ iroha_new_database_config and iroha_use_rdb }}"
+
+    - name: Remove iroha containers
+      docker_container:
+        name: "{{item.item.hostname[:item.item.hostname.rfind(':')]}}"
+        state: absent
+      loop: "{{ iroha_state.results }}"
+      tags: ["migrate-rdb"]
+
+    - name: Generate Docker Compose file
+      template:
+        src: docker-compose.yml.j2
+        dest: "{{ iroha_deploy_dir }}/docker-compose.yml"
+      tags: ["migrate-rdb"]
+
+    - name: Generate config files
+      template:
+        src: config.docker.j2
+        dest: "{{ iroha_deploy_dir }}/conf/{{ item.human_hostname }}/config.docker"
+      loop: "{{ iroha_nodes }}"
+      tags: ["migrate-rdb"]
+
+  when: migrate_rdb is defined and migrate_rdb
