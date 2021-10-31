@@ -151,8 +151,8 @@ iroha_service_host: False
 iroha_service_account: ''
 #  The number of keys must match the quorum settings
 iroha_service_account_keys: []
-iroha_new_database_config: False
-iroha_use_rdb: False
+iroha_new_database_config: True
+iroha_use_rdb: True
 
 migrate_rdb: True
 
