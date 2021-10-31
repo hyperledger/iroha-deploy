@@ -1,3 +1,5 @@
 #!/bin/bash
 
 migration-tool -block_store_path "{{iroha_blockstore_path}}" -rocksdb_path "{{iroha_rdb_data_path}}"
+
+wsv_checker -pg_opt "host={{ iroha_inventory_human_hostname }}-postgres port={{ iroha_postgres_port }} user={{ iroha_postgres_user }} password={{ iroha_postgres_password }} dbname={{ item.human_hostname }}" -rocksdb_path "{{ iroha_rdb_data_path }}"

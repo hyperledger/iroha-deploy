@@ -54,7 +54,8 @@
     - name: Generate migration script
       template:
         src: migrate.sh.j2
-        dest: "{{ iroha_deploy_dir }}/migrate.sh"
+        dest: "{{ iroha_deploy_dir }}/{{ item.human_hostname }}_migrate.sh"
+      loop: "{{ iroha_nodes }}"
       tags: ["migrate-rdb"]
 
     - name: deploy docker compose
@@ -62,17 +63,36 @@
         project_src: "{{ iroha_deploy_dir }}"
         files:
         - docker-compose.yml
+        state: present
       tags: ["migrate-rdb"]
 
     - name: copy migration script to containers
-      shell: docker cp "{{ iroha_deploy_dir }}/migrate.sh" "{{ item.hostname[:item.hostname.rfind(':')] }}:/tmp/migrate.sh"
+      shell: tar -cf - "{{ iroha_deploy_dir }}/{{ item.human_hostname }}_migrate.sh" --mode u=+x | docker cp - "{{ item.hostname[:item.hostname.rfind(':')] }}:/"
+      loop: "{{ iroha_nodes }}"
+      tags: ["migrate-rdb"]
+
+    - name: list dir
+      shell: docker exec "{{ item.hostname[:item.hostname.rfind(':')] }}" ls "/tmp/rdb"
+      register: dir
       loop: "{{ iroha_old_nodes }}"
+      tags: ["migrate-rdb"]
+
+    - name: directory content
+      debug:
+        msg: "{{item}}"
+      loop: "{{ dir.results }}"
       tags: ["migrate-rdb"]
 
     - name: run migration script
-      shell: docker exec "{{ item.hostname[:item.hostname.rfind(':')] }}" "/tmp/migrate.sh"
+      shell: docker exec "{{ item.hostname[:item.hostname.rfind(':')] }}" /bin/bash "{{ iroha_deploy_dir }}/{{ item.human_hostname }}_migrate.sh"
+      register: migration
       loop: "{{ iroha_old_nodes }}"
       tags: ["migrate-rdb"]
 
+    - name: migration content
+      debug:
+        msg: "{{item}}"
+      loop: "{{ migration.results }}"
+      tags: ["migrate-rdb"]
 
   when: migrate_rdb is defined and migrate_rdb

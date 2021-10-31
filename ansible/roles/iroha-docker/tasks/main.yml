@@ -4,17 +4,17 @@
 - name: Iroha clean
   include: clean.yml
 
-- name: Deploy Iroha util
-  include: iroha-util.yml
-
 - name: init Iroha vars
   include: init-vars.yml
 
-- name: generate Iroha configs
-  include: config-gen.yml
-
 - name: Migrate rdb
   include: migrate-rdb.yml
+
+- name: Deploy Iroha util
+  include: iroha-util.yml
+
+- name: generate Iroha configs
+  include: config-gen.yml
 
 - name: deploy Iroha
   include: deploy.yml
