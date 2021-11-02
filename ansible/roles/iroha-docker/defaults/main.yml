@@ -154,7 +154,8 @@ iroha_service_account_keys: []
 iroha_new_database_config: True
 iroha_use_rdb: True
 
-migrate_rdb: True
+iroha_migrate_rdb: True
+
 
 ## Iroha peer keys
 # Role will store automatically generated peer keys in this file:

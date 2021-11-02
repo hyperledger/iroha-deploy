@@ -22,7 +22,7 @@ services:
 {% endif %}
     environment:
       - "KEY={{ node.hostname }}"
-{% if not iroha_use_rdb %}
+{% if (not iroha_use_rdb) or (_iroha_deploy_migration_container is defined and _iroha_deploy_migration_container) %}
       - "IROHA_POSTGRES_HOST={{ iroha_inventory_human_hostname }}-postgres"
 {% endif %}
 {% for env_variable in iroha_docker_env_variables.items() %}
@@ -42,13 +42,13 @@ services:
       - {{ iroha_volume_dir }}iroha_rdb_data-{{ node.human_hostname }}:{{ iroha_rdb_data_path }}
 {% endif %}
       - ./conf/{{ node.human_hostname }}:/opt/iroha_data
-{% if not iroha_use_rdb %}
+{% if (not iroha_use_rdb) or (_iroha_deploy_migration_container is defined and _iroha_deploy_migration_container) %}
     depends_on:
       - {{ iroha_inventory_human_hostname }}-postgres
 {% endif %}
     networks:
       - {{ iroha_network_name }}
-{% if not iroha_use_rdb %}
+{% if (not iroha_use_rdb) or (_iroha_deploy_migration_container is defined and _iroha_deploy_migration_container) %}
       - iroha-db-net
 {% endif %}
 {% for net in iroha_additional_docker_networks %}
@@ -66,9 +66,14 @@ services:
 {% if iroha_docker_priviledged is defined %}
     privileged: true
 {% endif %}
+{% if _iroha_deploy_migration_container is defined and _iroha_deploy_migration_container %}
+    entrypoint: /bin/tail
+    command: -f /dev/null
+{% else %}
 {% if iroha_docker_commands is defined %}
     {#- Only JSON notation for commands can work in docker-compose #}
     command: {{ iroha_docker_commands | to_json }}
+{% endif %}
 {% endif %}
 {% if iroha_docker_cap_add %}
     cap_add:
@@ -85,7 +90,7 @@ services:
 
 {% endfor %}
 
-{% if not iroha_use_rdb %}
+{% if (not iroha_use_rdb) or (_iroha_deploy_migration_container is defined and _iroha_deploy_migration_container) %}
   {{ iroha_inventory_human_hostname }}-postgres:
     image: {{ iroha_postgres_docker_image }}:{{ iroha_postgres_docker_tag }}
     container_name: {{ iroha_inventory_human_hostname }}-postgres
@@ -132,7 +137,7 @@ volumes:
   iroha_rdb_data-{{ node.human_hostname }}:
 {% endfor %}
 {% endif %}
-{% if not iroha_use_rdb %}
+{% if (not iroha_use_rdb) or (_iroha_deploy_migration_container is defined and _iroha_deploy_migration_container) %}
   psql_storage-{{ iroha_inventory_human_hostname }}:
 {% endif %}
 {% endif %}
@@ -141,7 +146,7 @@ networks:
   {{ iroha_network_name }}:
     external:
       name: {{ iroha_network_name }}
-{% if not iroha_use_rdb %}
+{% if (not iroha_use_rdb) or (_iroha_deploy_migration_container is defined and _iroha_deploy_migration_container) %}
   iroha-db-net:
     name: iroha-db-net
 {% endif %}
