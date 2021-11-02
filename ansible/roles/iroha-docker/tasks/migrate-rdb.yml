@@ -86,28 +86,16 @@
       loop: "{{ iroha_nodes }}"
       tags: ["iroha-migrate-rdb"]
 
-    #- name: list dir
-      #shell: docker exec "{{ item.hostname[:item.hostname.rfind(':')] }}" ls "/tmp/rdb"
-      #register: dir
-      #loop: "{{ iroha_old_nodes }}"
-      #tags: ["iroha-migrate-rdb"]
-
-    #- name: directory content
-      #debug:
-        #msg: "{{item}}"
-      #loop: "{{ dir.results }}"
-      #tags: ["iroha-migrate-rdb"]
-
-    - name: run migration script
+    - name: Run migration script
       shell: docker exec "{{ item.hostname[:item.hostname.rfind(':')] }}" /bin/bash "/tmp/{{ item.human_hostname }}_migrate.sh"
       register: migration
       loop: "{{ iroha_old_nodes }}"
       tags: ["iroha-migrate-rdb"]
 
-    #- name: migration content
-      #debug:
-        #msg: "{{item}}"
-      #loop: "{{ migration.results }}"
-      #tags: ["iroha-migrate-rdb"]
+    - name: Remove postgres container
+      docker_container:
+        name: "{{ iroha_inventory_human_hostname }}-postgres"
+        state: absent
+      tags: ["iroha-migrate-rdb"]
 
   when: iroha_migrate_rdb is defined and iroha_migrate_rdb
