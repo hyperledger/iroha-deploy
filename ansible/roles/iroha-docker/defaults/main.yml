@@ -151,10 +151,23 @@ iroha_service_host: False
 iroha_service_account: ''
 #  The number of keys must match the quorum settings
 iroha_service_account_keys: []
-iroha_new_database_config: True
-iroha_use_rdb: True
 
-iroha_migrate_rdb: True
+## Postgres - rdb database configs
+# iroha_new_database_config: False and iroha_use_rdb: False stand for old Postgres config
+# iroha_new_database_config: True and iroha_use_rdb: False stand for new Postgres config
+# iroha_new_database_config: True and iroha_use_rdb: True stand for rdb config
+# iroha_new_database_config: False and iroha_use_rdb: True is not valid
+iroha_new_database_config: False
+iroha_use_rdb: False
+
+
+## Migration from Postgres to rdb
+# iroha_migrate_rdb: False stand for default run
+# iroha_migrate_rdb: True launches migration process
+# Requires running iroha instances and postgres instance
+# Requires iroha_new_database_config: True and iroha_use_rdb: True
+# Result is iroha containers with rdb config and all data from postgres containers
+iroha_migrate_rdb: False
 
 
 ## Iroha peer keys
