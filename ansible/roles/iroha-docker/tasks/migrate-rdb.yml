@@ -68,7 +68,7 @@
       loop: "{{ iroha_nodes }}"
       tags: ["iroha-migrate-rdb"]
 
-    - name: deploy docker compose
+    - name: Deploy docker compose
       docker_compose:
         project_src: "{{ iroha_deploy_dir }}"
         files:
@@ -81,7 +81,7 @@
         _iroha_deploy_migration_container: False
       tags: ["iroha-migrate-rdb"]
 
-    - name: copy migration script to containers
+    - name: Copy migration script to containers
       shell: docker cp "{{ iroha_deploy_dir }}/{{ item.human_hostname }}_migrate.sh" "{{ item.hostname[:item.hostname.rfind(':')] }}:/tmp/{{ item.human_hostname }}_migrate.sh"
       loop: "{{ iroha_nodes }}"
       tags: ["iroha-migrate-rdb"]
