@@ -1,25 +1,23 @@
-- name: task1
+- name: Migrate rdb
   block:
 
     - name: Get postgres container info
       docker_container_info:
         name: "{{ iroha_inventory_human_hostname }}-postgres"
       register: _iroha_deploy_postgres_state
-      tags: ["iroha-migrate-rdb"]
+
 
     - name: Check if postgres container is running
       assert:
         that: _iroha_deploy_postgres_state.container.State.Running and not _iroha_deploy_postgres_state.container.State.Restarting
         success_msg: "The container {{ iroha_inventory_human_hostname }}-postgres is running"
         fail_msg: "The container {{ iroha_inventory_human_hostname }}-postgres is not running"
-      tags: ["iroha-migrate-rdb"]
 
     - name: Get iroha containers info
       docker_container_info:
         name: "{{ item.hostname[:item.hostname.rfind(':')] }}"
       register: _iroha_deploy_iroha_state
       loop: "{{ iroha_nodes }}"
-      tags: ["iroha-migrate-rdb"]
 
     - name: Check if iroha containers are running
       assert:
@@ -27,75 +25,55 @@
         success_msg: "The container {{ item.item.hostname[:item.item.hostname.rfind(':')] }} is running"
         fail_msg: "The container {{ item.item.hostname[:item.item.hostname.rfind(':')] }} is not running"
       loop: "{{ _iroha_deploy_iroha_state.results }}"
-      tags: ["iroha-migrate-rdb"]
 
     - name: Check if new configuration is rdb
       fail:
         msg: "iroha_new_database_config and iroha_use_rdb should be True"
       when: "{{ not (iroha_new_database_config and iroha_use_rdb) }}"
-      tags: ["iroha-migrate-rdb"]
 
     - name: Remove iroha containers
       docker_container:
         name: "{{ item.item.hostname[:item.item.hostname.rfind(':')] }}"
         state: absent
       loop: "{{ _iroha_deploy_iroha_state.results }}"
-      tags: ["iroha-migrate-rdb"]
 
     - name: Configure docker compose template variables
       set_fact:
         _iroha_deploy_migration_container: True
-      tags: ["iroha-migrate-rdb"]
 
     - name: Generate Docker Compose file
       template:
         src: docker-compose.yml.j2
         dest: "{{ iroha_deploy_dir }}/docker-compose.yml"
-      tags: ["iroha-migrate-rdb"]
 
     - name: Generate config files
       template:
         src: config.docker.j2
         dest: "{{ iroha_deploy_dir }}/conf/{{ item.human_hostname }}/config.docker"
       loop: "{{ iroha_nodes }}"
-      tags: ["iroha-migrate-rdb"]
 
     - name: Generate migration script
       template:
         src: migrate.sh.j2
-        dest: "{{ iroha_deploy_dir }}/{{ item.human_hostname }}_migrate.sh"
+        dest: "{{ iroha_deploy_dir }}/conf/{{ item.human_hostname }}/migrate.sh"
         mode: u=rwx,g=r,o=r
       loop: "{{ iroha_nodes }}"
-      tags: ["iroha-migrate-rdb"]
 
-    - name: Deploy docker compose
+    - name: Deploy temporary docker compose which runs the migration script
       docker_compose:
         project_src: "{{ iroha_deploy_dir }}"
         files:
         - docker-compose.yml
         state: present
-      tags: ["iroha-migrate-rdb"]
 
     - name: Configure docker compose template variables
       set_fact:
         _iroha_deploy_migration_container: False
-      tags: ["iroha-migrate-rdb"]
-
-    - name: Copy migration script to containers
-      shell: docker cp "{{ iroha_deploy_dir }}/{{ item.human_hostname }}_migrate.sh" "{{ item.hostname[:item.hostname.rfind(':')] }}:/tmp/{{ item.human_hostname }}_migrate.sh"
-      loop: "{{ iroha_nodes }}"
-      tags: ["iroha-migrate-rdb"]
-
-    - name: Run migration script
-      shell: docker exec "{{ item.hostname[:item.hostname.rfind(':')] }}" /bin/bash "/tmp/{{ item.human_hostname }}_migrate.sh"
-      register: migration
-      loop: "{{ iroha_old_nodes }}"
-      tags: ["iroha-migrate-rdb"]
 
     - name: Remove postgres container
       docker_container:
         name: "{{ iroha_inventory_human_hostname }}-postgres"
         state: absent
-      tags: ["iroha-migrate-rdb"]
 
   when: iroha_migrate_rdb is defined and iroha_migrate_rdb
+  tags: ["iroha-migrate-rdb"]
