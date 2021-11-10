@@ -48,12 +48,15 @@ iroha_volume_dir: ""
 
 iroha_docker_image_pull: true
 iroha_docker_image: 'hyperledger/iroha'
-iroha_docker_tag: 'develop'
+iroha_docker_tag: '1.1.0'
 
 # Use this parameter to start Iroha with additional command line option.
 # Example, enabling WSV Reuse:
-iroha_docker_commands:
-  - '--drop-state'
+# iroha_docker_commands:
+#  - '--reuse_state'
+# Example, drop WSV state
+# iroha_docker_commands:
+#  - '--drop-state'
 
 
 iroha_postgres_docker_image: 'postgres'
@@ -168,7 +171,6 @@ iroha_use_rdb: False
 # Requires iroha_new_database_config: True and iroha_use_rdb: True
 # Result is iroha containers with rdb config and all data from postgres containers
 iroha_migrate_rdb: False
-
 
 ## Iroha peer keys
 # Role will store automatically generated peer keys in this file:
