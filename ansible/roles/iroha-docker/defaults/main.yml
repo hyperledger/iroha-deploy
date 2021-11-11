@@ -160,8 +160,8 @@ iroha_service_account_keys: []
 # iroha_new_database_config: True and iroha_use_rdb: False stand for new Postgres config
 # iroha_new_database_config: True and iroha_use_rdb: True stand for rdb config
 # iroha_new_database_config: False and iroha_use_rdb: True is not valid
-iroha_new_database_config: False
 iroha_use_rdb: False
+iroha_new_database_config: "{{ iroha_use_rdb }}"
 
 
 ## Migration from Postgres to rdb
