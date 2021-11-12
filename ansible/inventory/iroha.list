@@ -1,0 +1,6 @@
+# list the IP addresses (or hostnames if they are mutually resolveable on both hosts) of hosts that will run Iroha peers
+# i.e. 192.168.122.109
+
+[all]
+192.168.122.109
+192.168.122.30
