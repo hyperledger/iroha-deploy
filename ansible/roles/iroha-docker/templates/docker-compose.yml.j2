@@ -35,7 +35,7 @@ services:
 {% endfor %}
 {% endif %}
     volumes:
-{% if iroha_blockstore_path  %}
+{% if iroha_blockstore_path %}
       - {{ iroha_volume_dir }}iroha_block_store-{{ node.human_hostname }}:{{ iroha_blockstore_path }}
 {% endif %}
 {% if iroha_use_rdb %}
