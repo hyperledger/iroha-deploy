@@ -156,3 +156,61 @@ Deploying 6 Iroha peers on two remote hosts communicating over overlay network (
 
 ##### Caveats
 1. If `/usr/bin/python` does not exist on a remote host, Ansible will fail with the misleading message: `... Make sure this host can be reached over ssh`. This usually happens when Ansible uses Python 3. On Ubuntu systems `/usr/bin/python3` is not symlinked to `/usr/bin/python` which Ansible expects to find. The problem can be solved by setting `ansible_python_interpreter` variable to `/usr/bin/python3`.
+
+
+# Migration of WSV from Postgres to Rocksdb
+
+Migraion from Postgres to Rocksdb replaces [WSV](https://iroha.readthedocs.io/en/develop/concepts_architecture/architecture.html) from Postgres to Rocksdb.
+
+During the migration blockstore stays the same, postgres container is stopped and rocksdb is located inside iroha containers.
+
+
+# Migration process
+**Make sure that you read the documentation before migration**
+
+Migration is possible only in one direction. If you migrate WSV to Rocksdb and update blockchain, you will not be able to migrate new blocks to Postgres WSV,this case is not considered by developers. But it is possible to restore the state of Postgres WSV (the state right before migration), if Postgres container is not deleted (migration only stops the container). So do not delete Postgres unless you are sure that everything works correctly after migration.
+
+## Prerequisites before migration: Usual run parameters with Postgres WSV
+Before the migration, check that Postgres was runned with these parameters in ansible defaults. Also, Postgres container should be running.
+
+```
+iroha_use_rdb: False
+iroha_migrate_rdb: False
+```
+
+Do not run anything, but check that state is the same.
+
+## Run migration 
+To run the migration change these parameters to the following state.
+```
+iroha_use_rdb: True
+iroha_migrate_rdb: True
+```
+This state means that you want to migrate WSV to Rocksdb. `iroha_migrate_rdb: True` will prepare the temporary containers and run migration script. Note that it will note run unless `iroha_use_rdb: True`, because only migration to Rocksdb is allowed.
+
+## Config after migration
+After you run migration return `iroha_migrate_rdb: False` state, otherwise you will try to migrate state once more and will fail.
+Also, make `iroha_use_rdb: True` state, so that you use Rocksdb WSV afterwards.
+
+```
+iroha_use_rdb: True
+iroha_migrate_rdb: False
+```
+## Restoring Postgres WSV state that was right before migration
+
+**Try to avoid this case. Restore the state, only if you made migration wrong**
+
+This is possible only if Postgres container with WSV is stopped and not deleted. Otherwise you will create new Postgres WSV and new blockchain.
+
+Change these parameters to the following state and run the role.
+```
+iroha_use_rdb: False
+iroha_migrate_rdb: False
+```
+At this point you will have 2 different WSVs: one in Postgres and one in Rocksdb volume (which will not be mounted to the iroha containers). If you want to repeat migration from Postgres WSV to Rocksdb WSV, you will need to delete Rocksdb volumes and repeat the migration process again.
+
+## Possible wrong runs
+
+If someone accidentally runs the role with Postgres WSV configuration after migration, you will lose some blocks in any case. 
+1. If you want to use Rocksdb WSV, run the role with Rocksdb WCV configuration to continue running Rocksdb WSV. Also you may want to delete newly created postgres container. In this case you will lose information about blocks created when using new Postgres.
+2. If you want to use Postgres WSV (which will be not recommended), you can leave everything as it is. In this case you will save information about newly created blocks, but will lose state of blocks created when using Rocksdb WSV.
