@@ -15,9 +15,9 @@
   "max_proposal_size" : {{ iroha_max_proposal_size }},
 {% if iroha_new_database_config %}
   "database": {
-{% if iroha_use_rdb %}
+{% if iroha_use_rocksdb %}
     "type":"rocksdb",
-    "path":"{{ iroha_rdb_data_path }}"
+    "path":"{{ iroha_rocksdb_data_path }}"
 {% else %}
     "type":"postgres",
     "host": "{{ iroha_inventory_human_hostname }}-postgres",

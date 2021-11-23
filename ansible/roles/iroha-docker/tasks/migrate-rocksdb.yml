@@ -1,4 +1,4 @@
-- name: Migrate rdb
+- name: Migrate rocksdb
   block:
 
     - name: Get postgres container info
@@ -26,10 +26,10 @@
         fail_msg: "The container {{ item.item.hostname[:item.item.hostname.rfind(':')] }} is not running"
       loop: "{{ _iroha_deploy_iroha_state.results }}"
 
-    - name: Check if new configuration is rdb
+    - name: Check if new configuration is rocksdb
       fail:
-        msg: "iroha_new_database_config and iroha_use_rdb should be True"
-      when: "{{ not (iroha_new_database_config and iroha_use_rdb) }}"
+        msg: "iroha_new_database_config and iroha_use_rocksdb should be True"
+      when: "{{ not (iroha_new_database_config and iroha_use_rocksdb) }}"
 
     - name: Remove iroha containers
       docker_container:
@@ -75,5 +75,5 @@
         name: "{{ iroha_inventory_human_hostname }}-postgres"
         state: absent
 
-  when: iroha_migrate_rdb is defined and iroha_migrate_rdb
-  tags: ["iroha-migrate-rdb"]
+  when: iroha_migrate_rocksdb is defined and iroha_migrate_rocksdb
+  tags: ["iroha-migrate-rocksdb"]
