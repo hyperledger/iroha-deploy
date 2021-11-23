@@ -160,7 +160,7 @@ iroha_service_account_keys: []
 # iroha_new_database_config: True and iroha_use_rdb: False stand for new Postgres config
 # iroha_new_database_config: True and iroha_use_rdb: True stand for rdb config
 # iroha_new_database_config: False and iroha_use_rdb: True is not valid
-iroha_use_rdb: False
+iroha_use_rdb: True
 iroha_new_database_config: "{{ iroha_use_rdb }}"
 
 
@@ -170,7 +170,7 @@ iroha_new_database_config: "{{ iroha_use_rdb }}"
 # Requires running iroha instances and postgres instance
 # Requires iroha_new_database_config: True and iroha_use_rdb: True
 # Result is iroha containers with rdb config and all data from postgres containers
-iroha_migrate_rdb: False
+iroha_migrate_rdb: True
 
 ## Iroha peer keys
 # Role will store automatically generated peer keys in this file:
