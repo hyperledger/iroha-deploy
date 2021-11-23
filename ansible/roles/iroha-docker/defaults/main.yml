@@ -97,7 +97,7 @@ iroha_postgres_host: iroha-postgres
 iroha_postgres_port: 5432
 # set it to empty line (e.g "") to use postgres instead of files for storing blocks (iroha 1.2.0+)
 iroha_blockstore_path: /tmp/block_store
-iroha_rdb_data_path: /tmp/rdb
+iroha_rocksdb_data_path: /tmp/rdb
 #iroha_mst_expiration_time: 1440
 #iroha_max_rounds_delay: 3000
 #proposal_creation_timeout: 3000
@@ -155,22 +155,23 @@ iroha_service_account: ''
 #  The number of keys must match the quorum settings
 iroha_service_account_keys: []
 
-## Postgres - rdb database configs
-# iroha_new_database_config: False and iroha_use_rdb: False stand for old Postgres config
-# iroha_new_database_config: True and iroha_use_rdb: False stand for new Postgres config
-# iroha_new_database_config: True and iroha_use_rdb: True stand for rdb config
-# iroha_new_database_config: False and iroha_use_rdb: True is not valid
-iroha_use_rdb: True
-iroha_new_database_config: "{{ iroha_use_rdb }}"
+
+## Postgres - Rocksdb database configs
+# iroha_new_database_config: False and iroha_use_rocksdb: False stand for old Postgres config
+# iroha_new_database_config: True and iroha_use_rocksdb: False stand for new Postgres config
+# iroha_new_database_config: True and iroha_use_rocksdb: True stand for Rocksdb config
+# iroha_new_database_config: False and iroha_use_rocksdb: True is not valid
+iroha_use_rocksdb: False
+iroha_new_database_config: "{{ iroha_use_rocksdb }}"
 
 
-## Migration from Postgres to rdb
-# iroha_migrate_rdb: False stand for default run
-# iroha_migrate_rdb: True launches migration process
+## Migration from Postgres to Rocksdb
+# iroha_migrate_rocksdb: False stand for default run
+# iroha_migrate_rocksdb: True launches migration process
 # Requires running iroha instances and postgres instance
-# Requires iroha_new_database_config: True and iroha_use_rdb: True
-# Result is iroha containers with rdb config and all data from postgres containers
-iroha_migrate_rdb: True
+# Requires iroha_new_database_config: True and iroha_use_rocksdb: True
+# Result is iroha containers with Rocksdb config and all data from postgres containers
+iroha_migrate_rocksdb: False
 
 ## Iroha peer keys
 # Role will store automatically generated peer keys in this file:

@@ -7,8 +7,8 @@
 - name: init Iroha vars
   include: init-vars.yml
 
-- name: Migrate rdb
-  include: migrate-rdb.yml
+- name: Migrate Rocksdb
+  include: migrate-rocksdb.yml
 
 - name: Deploy Iroha util
   include: iroha-util.yml

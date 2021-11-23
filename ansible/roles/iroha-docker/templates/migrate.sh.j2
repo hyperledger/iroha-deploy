@@ -1,5 +1,5 @@
 #!/bin/bash
 
-iroha_migrate -block_store_path "{{iroha_blockstore_path}}" -rocksdb_path "{{iroha_rdb_data_path}}"
+iroha_migrate -block_store_path "{{iroha_blockstore_path}}" -rocksdb_path "{{iroha_rocksdb_data_path}}"
 
-iroha_wsv_diff -pg_opt "host={{ iroha_inventory_human_hostname }}-postgres port={{ iroha_postgres_port }} user={{ iroha_postgres_user }} password={{ iroha_postgres_password }} dbname={{ item.human_hostname }}" -rocksdb_path "{{ iroha_rdb_data_path }}"
+iroha_wsv_diff -pg_opt "host={{ iroha_inventory_human_hostname }}-postgres port={{ iroha_postgres_port }} user={{ iroha_postgres_user }} password={{ iroha_postgres_password }} dbname={{ item.human_hostname }}" -rocksdb_path "{{ iroha_rocksdb_data_path }}"

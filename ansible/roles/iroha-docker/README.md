@@ -174,8 +174,8 @@ Migration is possible only in one direction. If you migrate WSV to Rocksdb and u
 Before the migration, check that Postgres was runned with these parameters in ansible defaults. Also, Postgres container should be running.
 
 ```
-iroha_use_rdb: False
-iroha_migrate_rdb: False
+iroha_use_rocksdb: False
+iroha_migrate_rocksdb: False
 ```
 
 Do not run anything, but check that state is the same.
@@ -183,18 +183,18 @@ Do not run anything, but check that state is the same.
 ## Run migration 
 To run the migration change these parameters to the following state.
 ```
-iroha_use_rdb: True
-iroha_migrate_rdb: True
+iroha_use_rocksdb: True
+iroha_migrate_rocksdb: True
 ```
-This state means that you want to migrate WSV to Rocksdb. `iroha_migrate_rdb: True` will prepare the temporary containers and run migration script. Note that it will note run unless `iroha_use_rdb: True`, because only migration to Rocksdb is allowed.
+This state means that you want to migrate WSV to Rocksdb. `iroha_migrate_rocksdb: True` will prepare the temporary containers and run migration script. Note that it will note run unless `iroha_use_rocksdb: True`, because only migration to Rocksdb is allowed.
 
 ## Config after migration
-After you run migration return `iroha_migrate_rdb: False` state, otherwise you will try to migrate state once more and will fail.
-Also, make `iroha_use_rdb: True` state, so that you use Rocksdb WSV afterwards.
+After you run migration return `iroha_migrate_rocksdb: False` state, otherwise you will try to migrate state once more and will fail.
+Also, make `iroha_use_rocksdb: True` state, so that you use Rocksdb WSV afterwards.
 
 ```
-iroha_use_rdb: True
-iroha_migrate_rdb: False
+iroha_use_rocksdb: True
+iroha_migrate_rocksdb: False
 ```
 ## Restoring Postgres WSV state that was right before migration
 
@@ -204,8 +204,8 @@ This is possible only if Postgres container with WSV is stopped and not deleted.
 
 Change these parameters to the following state and run the role.
 ```
-iroha_use_rdb: False
-iroha_migrate_rdb: False
+iroha_use_rocksdb: False
+iroha_migrate_rocksdb: False
 ```
 At this point you will have 2 different WSVs: one in Postgres and one in Rocksdb volume (which will not be mounted to the iroha containers). If you want to repeat migration from Postgres WSV to Rocksdb WSV, you will need to delete Rocksdb volumes and repeat the migration process again.
 
