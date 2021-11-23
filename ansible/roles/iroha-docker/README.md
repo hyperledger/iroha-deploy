@@ -160,7 +160,7 @@ Deploying 6 Iroha peers on two remote hosts communicating over overlay network (
 
 # Migration of WSV from Postgres to Rocksdb
 
-Migraion from Postgres to Rocksdb replaces [WSV](https://iroha.readthedocs.io/en/develop/concepts_architecture/architecture.html) from Postgres to Rocksdb.
+Migraion from Postgres to Rocksdb replaces [World State View (WSV)](https://iroha.readthedocs.io/en/develop/concepts_architecture/architecture.html) from Postgres to Rocksdb.
 
 During the migration blockstore stays the same, postgres container is stopped and rocksdb is located inside iroha containers.
 
