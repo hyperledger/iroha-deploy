@@ -67,7 +67,8 @@ services:
     privileged: true
 {% endif %}
 {% if _iroha_deploy_migration_container is defined and _iroha_deploy_migration_container %}
-    command: /bin/bash /opt/iroha_data/migrate.sh
+    entrypoint: /bin/tail
+    command: -f /dev/null
 {% else %}
 {% if iroha_docker_commands is defined %}
     {#- Only JSON notation for commands can work in docker-compose #}
