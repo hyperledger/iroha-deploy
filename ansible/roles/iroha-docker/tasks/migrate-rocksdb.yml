@@ -64,13 +64,16 @@
         mode: u=rwx,g=r,o=r
       loop: "{{ iroha_nodes }}"
 
-    - name: Deploy temporary docker compose which runs the migration script
+    - name: Deploy temporary docker compose
       docker_compose:
         project_src: "{{ iroha_deploy_dir }}"
         files:
           - docker-compose.yml
         state: present
     
+    - name: run migration script
+      shell: docker exec "{{ item.hostname[:item.hostname.rfind(':')] }}" /bin/bash /opt/iroha_data/migrate.sh
+      loop: "{{ iroha_nodes }}"
 
     # - name: Wait 
     #   wait_for:

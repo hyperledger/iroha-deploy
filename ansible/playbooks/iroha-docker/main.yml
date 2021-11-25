@@ -3,6 +3,3 @@
   strategy: linear
   roles:
     - { role: iroha-docker, tags: iroha-docker }
-  vars:
-    iroha_docker_image: 'hyperledger/iroha'
-    iroha_docker_tag: 'develop'
