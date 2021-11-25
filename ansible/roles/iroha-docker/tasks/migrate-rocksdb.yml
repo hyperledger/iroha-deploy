@@ -12,7 +12,6 @@
         that: _iroha_deploy_postgres_state.container.State.Running and not _iroha_deploy_postgres_state.container.State.Restarting
         success_msg: "The container {{ iroha_inventory_human_hostname }}-postgres is running"
         fail_msg: "The container {{ iroha_inventory_human_hostname }}-postgres is not running"
-      no_log: True
     
     - name: Get iroha containers info
       docker_container_info:
@@ -26,7 +25,6 @@
         that: "{{ item.container.State.Running and not item.container.State.Restarting }}"
         success_msg: "The container {{ item.item.hostname[:item.item.hostname.rfind(':')] }} is running"
         fail_msg: "The container {{ item.item.hostname[:item.item.hostname.rfind(':')] }} is not running"
-        quiet: true
       loop: "{{ _iroha_deploy_iroha_state.results }}"
       no_log: True
 
@@ -74,30 +72,6 @@
     - name: run migration script
       shell: docker exec "{{ item.hostname[:item.hostname.rfind(':')] }}" /bin/bash /opt/iroha_data/migrate.sh
       loop: "{{ iroha_nodes }}"
-
-    # - name: Wait 
-    #   wait_for:
-    #     timeout: 30
-    #   #loop: "{{ iroha_nodes }}"
-
-    # - name: Check containers
-    #   docker_container_info:
-    #     name: "{{ item.hostname[:item.hostname.rfind(':')] }}"  
-    #   register: _iroha_deploy_docker_temporary
-    #   loop: "{{ iroha_nodes }}"
-
-    # - name: Check if iroha containers finished successfully
-    #   assert:
-    #     that: "{{ item.container.State.ExitCode == 0 }}"
-    #     success_msg: "The container {{ item.item.hostname[:item.item.hostname.rfind(':')] }} migrated succesfully"
-    #     fail_msg: "The container {{ item.item.hostname[:item.item.hostname.rfind(':')] }} did not migrate succesfully"
-    #     quiet: true
-    #   loop: "{{ _iroha_deploy_docker_temporary.results }}"
-      
-
-    # - name: debug
-    #   debug:
-    #     msg: "{{ _iroha_deploy_docker_temporary }}"
 
     - name: Configure docker compose template variables
       set_fact:
