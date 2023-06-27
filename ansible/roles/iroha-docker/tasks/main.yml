@@ -1,20 +1,20 @@
 - name: Iroha check
-  include: check.yml
+  import_tasks: check.yml
 
 - name: Iroha clean
-  include: clean.yml
+  import_tasks: clean.yml
 
 - name: Deploy Iroha util
-  include: iroha-util.yml
+  import_tasks: iroha-util.yml
 
 - name: init Iroha vars
-  include: init-vars.yml
+  import_tasks: init-vars.yml
 
 - name: Migrate Rocksdb
-  include: migrate-rocksdb.yml
+  import_tasks: migrate-rocksdb.yml
 
 - name: generate Iroha configs
-  include: config-gen.yml
+  import_tasks: config-gen.yml
 
 - name: deploy Iroha
-  include: deploy.yml
+  import_tasks: deploy.yml
