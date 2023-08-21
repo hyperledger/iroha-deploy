@@ -1,8 +1,10 @@
-FROM python:3.7-slim-stretch
+FROM python:3.8.10-slim
 
 WORKDIR /opt/app
 
-RUN pip3 install iroha==1.0.0 ansible==2.10.7
+RUN pip3 install iroha==1.0.0 ansible==2.10.7 && \
+    pip3 uninstall -y protobuf && \
+    pip3 install protobuf==3.12.2
 
 COPY iroha_utils.py iroha_utils.py
 
