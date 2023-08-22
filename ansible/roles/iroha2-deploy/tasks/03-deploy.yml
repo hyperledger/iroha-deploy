@@ -21,7 +21,6 @@
         force: yes
       loop:
         - { dst: "genesis.json", dst_path: "." }
-      when: (ec2_tag_Name == 'iroha2-stage1-s1') or (ec2_tag_Name == 'iroha2-tst-s1')
 
     - name: deploy | copy validator.wasm file to peers
       get_url:
@@ -33,7 +32,6 @@
         force: yes
       loop:
         - { dst: "validator.wasm", dst_path: "." }
-      when: (ec2_tag_Name == 'iroha2-stage1-s1') or (ec2_tag_Name == 'iroha2-tst-s1')
 
     - name: deploy | copy initial config
       template:
