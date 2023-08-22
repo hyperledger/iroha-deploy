@@ -1,8 +1,0 @@
-# handlers file for Iroha
----
-- name: restart Iroha
-  docker_compose:
-    project_src: "{{ iroha_deploy_dir }}"
-    pull: "{{ iroha_docker_image_pull }}"
-    state: present
-    recreate: always

@@ -1,0 +1,17 @@
+- block:
+
+    - name: create docker network
+      docker_network:
+        name: "{{ iroha2_deploy_docker_network }}"
+
+    - name: deploy single peer
+      include_tasks: single-peer.yml
+      when: iroha2_deploy_peer_count == 1
+
+    - name: deploy multiple peers
+      include_tasks: multi-peer.yml
+      when: iroha2_deploy_peer_count > 1
+      loop: "{{ range(iroha2_deploy_peer_count) | list }}"
+      loop_control: { loop_var: "peer_index" }
+
+  tags: ["iroha2-deploy", "iroha2-deploy_deploy"]

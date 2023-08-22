@@ -1,0 +1,69 @@
+version: "2.4"
+
+services:
+  iroha2:
+    container_name: {{ iroha2_deploy_container_name }}
+    image: {{ iroha2_deploy_image }}:{{ iroha2_deploy_version }}
+    restart: always
+    mem_limit: {{ iroha2_deploy_mem_limit }}
+{% if iroha2_deploy_longevity_stand %}    
+    cpus: {{ iroha2_deploy_cpu_limit }}
+{% endif %}    
+    environment:
+      IROHA_PUBLIC_KEY: '{{ iroha2_deploy_key_pair['public_key'] }}'
+      IROHA_PRIVATE_KEY: '{{ iroha2_deploy_key_pair['private_key'] | to_json }}'
+      TERMINAL_COLORS: 'false'
+      DISABLE_PANIC_TERMINAL_COLORS: 'true'
+    command:
+      - "./usr/local/bin/iroha"
+{% if iroha2_deploy_submit_genesis %} 
+      - "--submit-genesis"
+{% endif %}
+    volumes:
+      - {{ iroha2_deploy_local_kura_path }}:{{ iroha2_deploy_kura_path }}
+      - {{ iroha2_deploy_local_config_path }}:{{ iroha2_deploy_config_path }}
+      - {{ iroha2_deploy_local_config_path }}:/app/.cache/wasmtime
+
+{% if iroha2_deploy_expose_ports %}
+    ports:
+      - "{{ iroha2_deploy_torii_port }}:{{ iroha2_deploy_torii_port }}"
+      - "{{ iroha2_deploy_http_port }}:{{ iroha2_deploy_http_port }}"
+      - "{{ iroha2_deploy_http_status_port }}:{{ iroha2_deploy_http_status_port }}"
+{% endif %}
+
+{% if iroha2_deploy_docker_labels %}
+    labels:
+{% for label, value in iroha2_deploy_docker_labels.items() %}
+      - '{{ label }}={{ value }}'
+{% endfor %}
+{% endif %}
+
+    networks:
+      - {{ iroha2_deploy_docker_network }}
+    {% for net in iroha2_deploy_docker_extra_networks %}
+      - {{ net }}
+    {% endfor %}
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+    healthcheck:
+      test: {{ iroha2_deploy_healthcheck_command }}
+      interval: 1m
+      timeout: 10s
+      retries: 6
+      start_period: 2m        
+
+networks:
+  {{ iroha2_deploy_docker_network }}:
+    external:
+      name: {{ iroha2_deploy_docker_network }}
+
+  {% for net in iroha2_deploy_docker_extra_networks %}
+  {{ net }}:
+    external:
+      name: {{ net }}
+  {% endfor %}

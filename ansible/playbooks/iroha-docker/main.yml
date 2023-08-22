@@ -1,5 +1,0 @@
-- hosts: all
-  # we need to use linear strategy, because some variables are set in runtime
-  strategy: linear
-  roles:
-    - { role: iroha-docker, tags: iroha-docker }

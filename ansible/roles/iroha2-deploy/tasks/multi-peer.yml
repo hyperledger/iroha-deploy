@@ -1,0 +1,16 @@
+- block:
+    - name: prepare peer varaibles
+      set_fact:
+        iroha2_deploy_dir: "{{ _iroha2_deploy_dir }}-{{ peer_index }}"
+        
+        iroha2_deploy_torii_port: "{{ iroha2_deploy_torii_base_port + peer_index }}"
+        iroha2_deploy_http_port: "{{ iroha2_deploy_http_base_port + peer_index }}"
+        
+        iroha2_deploy_container_name: "{{ _iroha2_deploy_container_name }}-{{ peer_index }}"
+
+    - name: deploy peer
+      import_tasks: single-peer.yml
+
+
+  tags: ["iroha2-deploy", "iroha2-deploy_deploy"]
+

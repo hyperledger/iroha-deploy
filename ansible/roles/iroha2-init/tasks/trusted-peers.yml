@@ -1,0 +1,40 @@
+- block:
+
+    - name: check if trusted peers exists
+      local_action:
+        module: stat
+        path: "{{ playbook_dir }}/vars/trusted-peers.json"
+      register: _iroha2_init_trusted_peers_stat
+
+    - block:
+        - name: initialize trusted peers
+          set_fact:
+            _iroha2_init_trusted_peers: >-
+              {%- set output = [] -%}
+              {%- for domain in _iroha2_init_peer_domains -%}
+                {%- set key_pair_path = playbook_dir + '/vars/keys/' + domain + '.json' -%}
+                {{ output.append({
+                    "address": domain,
+                    "public_key": ( lookup('file', key_pair_path) | from_json )['public_key']
+                }) }}
+              {%- endfor -%}
+              {{ output }}
+
+        - name: check trusted peers format
+          fail:
+            msg: "Could not create trusted peers config"
+          when: "_iroha2_init_trusted_peers is not defined "
+
+        - name: save trusted peers
+          local_action:
+            module: copy
+            content: "{{ _iroha2_init_trusted_peers | to_json }}"
+            dest: "{{ playbook_dir }}/vars/trusted-peers.json"
+
+      when: not _iroha2_init_trusted_peers_stat.stat.exists or iroha2_init_force_recreate
+
+  run_once: true
+  become: false
+  delegate_to: "localhost"
+  when: ansible_limit is not defined and not ansible_check_mode
+  tags: ["iroha2-init", "iroha2-init_trusted-peers"]

@@ -1,0 +1,15 @@
+- block:
+    - name: clean | stop services for cleaning
+      docker_compose:
+        project_src: "{{ iroha2_deploy_dir }}"
+        files: [docker-compose.yml]
+        state: absent
+      when: iroha2_deploy_clean_blockstore
+
+    - name: clean | clear old blockstore
+      file:
+        path: "{{ iroha2_deploy_local_kura_path }}"
+        state: absent
+
+  when: iroha2_deploy_clean_blockstore
+  tags: ["iroha2-deploy", "iroha2-deploy_clean"]

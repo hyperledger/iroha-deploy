@@ -1,0 +1,22 @@
+- block:
+    - name: check | iroha2 version
+      fail:
+        msg: "You need to set the version of kagome"
+      when: "iroha2_deploy_version is not defined"
+
+    - name: check | iroha2 domain name
+      fail:
+        msg: "You need to set the version of kagome"
+      when: "iroha2_deploy_domain_name is not defined"
+
+    - name: check | key pair is found
+      fail:
+        msg: "Key pair not set"
+      when: "iroha2_deploy_key_pair is not defined"
+
+    - name: check | trusted peers is found
+      fail:
+        msg: "Trusted peers not set"
+      when: "iroha2_deploy_trusted_peers is not defined"
+
+  tags: ["iroha2-deploy", "iroha2-deploy_check"]

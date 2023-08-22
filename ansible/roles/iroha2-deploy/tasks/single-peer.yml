@@ -1,0 +1,12 @@
+- name: clean blockstore
+  include_tasks: "01-clean.yml"
+  when: iroha2_deploy_clean_blockstore
+  tags: ["iroha2-deploy", "iroha2-deploy_clean"]
+
+- name: check deployment vars
+  import_tasks: "02-check.yml"
+  tags: ["iroha2-deploy", "iroha2-deploy_check"]
+
+- name: deploy iroha2
+  import_tasks: "03-deploy.yml"
+  tags: ["iroha2-deploy", "iroha2-deploy_deploy"]

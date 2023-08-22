@@ -1,4 +1,0 @@
-iroha_docker_image: 'hyperledger/iroha'
-iroha_docker_tag: 'develop'
-iroha_use_rocksdb: False
-iroha_migrate_rocksdb: False

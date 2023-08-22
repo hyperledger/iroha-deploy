@@ -1,0 +1,92 @@
+{
+  "PUBLIC_KEY": "{{ iroha2_deploy_config_key_pair['public_key'] }}",
+  "PRIVATE_KEY": {{ iroha2_deploy_config_key_pair['private_key'] | to_nice_json }},
+  "DISABLE_PANIC_TERMINAL_COLORS": false,
+  "KURA": {
+    "INIT_MODE": "strict",
+    "BLOCK_STORE_PATH": "{{ iroha2_deploy_kura_path }}",
+    "BLOCKS_PER_STORAGE_FILE": {{ iroha2_deploy_kura_blocks_per_storage }},
+    "ACTOR_CHANNEL_CAPACITY": {{ iroha2_deploy_kura_actor_channel_capacity }},
+    "DEBUG_OUTPUT_NEW_BLOCKS": false
+  },
+  "SUMERAGI": {
+    "KEY_PAIR": null,
+    "PEER_ID": null,
+    "BLOCK_TIME_MS": {{ iroha2_deploy_sumeragi_block_time }},
+    "TRUSTED_PEERS": {{ iroha2_deploy_trusted_peers | to_nice_json }},
+    "COMMIT_TIME_LIMIT_MS": {{ iroha2_deploy_commit_time_ms }},
+    "MAX_TRANSACTIONS_IN_BLOCK": {{ iroha2_deploy_sumeragi_max_block_transactions }},
+    "ACTOR_CHANNEL_CAPACITY": {{ iroha2_deploy_sumeragi_actor_channel_capacity }},
+    "GOSSIP_BATCH_SIZE": {{ iroha2_deploy_sumeragi_gossip_batch_size }},
+    "GOSSIP_PERIOD_MS": {{ iroha2_deploy_sumeragi_gossip_period }}
+  },
+  "TORII": {
+    "P2P_ADDR": "0.0.0.0:{{ iroha2_deploy_torii_port }}",
+    "API_URL": "0.0.0.0:{{ iroha2_deploy_http_port }}",
+    "TELEMETRY_URL": "{{ iroha2_deploy_torii_telemetry_url }}",
+    "MAX_TRANSACTION_SIZE": {{ iroha2_deploy_torii_max_transaction_size }},
+    "MAX_CONTENT_LEN": {{ iroha2_deploy_torii_max_content_length }}
+  },
+  "BLOCK_SYNC": {
+    "GOSSIP_PERIOD_MS": {{ iroha2_deploy_block_sync_gossip_period_ms }},
+    "BLOCK_BATCH_SIZE": {{ iroha2_deploy_block_sync_batch_size }},
+    "ACTOR_CHANNEL_CAPACITY": {{ iroha2_deploy_block_sync_actor_channel_capacity }}
+  },
+  "QUEUE": {
+    "MAXIMUM_TRANSACTIONS_IN_QUEUE": {{ iroha2_deploy_queue_max_queue_transactions }},
+    "MAX_TRANSACTIONS_IN_QUEUE_PER_USER": {{ iroha2_deploy_queue_max_per_user_transactions }},
+    "TRANSACTION_TIME_TO_LIVE_MS": {{ iroha2_deploy_queue_time_live_transactions }},
+    "FUTURE_THRESHOLD_MS": {{ iroha2_deploy_queue_future_threshold }}
+  },
+  "LOGGER": {
+    "MAX_LOG_LEVEL": "{{ iroha2_deploy_logger_log_level }}",
+    "TELEMETRY_CAPACITY": {{ iroha2_deploy_logger_telemetry_capacity }},
+    "COMPACT_MODE": false,
+    "LOG_FILE_PATH": null,
+    "TERMINAL_COLORS": true
+  },
+  "GENESIS": {
+    "ACCOUNT_PUBLIC_KEY": "{{ iroha2_deploy_genesis_key_pair['account_public_key'] }}",
+    "ACCOUNT_PRIVATE_KEY": {{ iroha2_deploy_genesis_key_pair['account_private_key'] | to_nice_json }},
+  },
+  "WSV": {
+    "ASSET_METADATA_LIMITS": {
+      "max_len": {{ iroha2_deploy_wsv_asset_metadata_limits_max_len }},
+      "max_entry_byte_size": {{ iroha2_deploy_wsv_asset_metadata_limits_max_entry }}
+    },
+    "ASSET_DEFINITION_METADATA_LIMITS": {
+      "max_len": {{ iroha2_deploy_wsv_asset_definition_max_len }},
+      "max_entry_byte_size": {{ iroha2_deploy_wsv_asset_definition_max_enry }}
+    },
+    "ACCOUNT_METADATA_LIMITS": {
+      "max_len": {{ iroha2_deploy_wsv_account_metadata_max_len }},
+      "max_entry_byte_size": {{ iroha2_deploy_wsv_account_metadata_max_entry }}
+    },
+    "DOMAIN_METADATA_LIMITS": {
+      "max_len": {{ iroha2_deploy_wsv_domain_metadata_max_len }},
+      "max_entry_byte_size": {{ iroha2_deploy_wsv_domain_metadata_max_entry }}
+    },
+    "IDENT_LENGTH_LIMITS": {
+      "min": {{ iroha2_deploy_wsv_ident_length_min }},
+      "max": {{ iroha2_deploy_wsv_ident_length_max }}
+    },
+    "TRANSACTION_LIMITS": {
+      "max_instruction_number": {{ iroha2_deploy_wsv_transactions_limits_max_instruction_number }},
+      "max_wasm_size_bytes": {{ iroha2_deploy_wsv_transactions_limits_max_wasm_size }}
+    },
+    "WASM_RUNTIME_CONFIG": {
+      "FUEL_LIMIT": {{ iroha2_deploy_wsv_wasm_runtime_fuel }},
+      "MAX_MEMORY": {{ iroha2_deploy_wsv_wasm_runtime_max_memory }}
+    }
+  },
+  "NETWORK": {
+    "ACTOR_CHANNEL_CAPACITY": {{ iroha2_deploy_network_actor_channel_capacity }}
+  },
+  "TELEMETRY": {
+  "NAME": null,
+  "URL": "{{ iroha2_deploy_telemetry_url }}",
+  "MIN_RETRY_PERIOD": {{ iroha2_deploy_telemetry_min_retry }},
+  "MAX_RETRY_DELAY_EXPONENT": {{ iroha2_deploy_telemetry_max_retry }},
+  "FILE": null
+  }
+}
