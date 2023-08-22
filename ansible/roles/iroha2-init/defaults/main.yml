@@ -1,0 +1,13 @@
+iroha2_init_domains: []
+#  - domain: "s1.test.iroha2.tech"
+#    count: 2
+
+# DANGER !!! this will recreate the keys
+iroha2_init_force_recreate: false
+
+iroha2_init_torii_port: ""
+
+iroha2_init_keygen_image_name: "iroha1/iroha"
+iroha2_init_keygen_image_version: "iroha2-crypto-cli-dev"
+iroha2_init_keys_ansible_encrypt_enable: false
+iroha2_init_keys_ansible_encrypt_password_file:

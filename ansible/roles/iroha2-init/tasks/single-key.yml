@@ -1,0 +1,56 @@
+- block:
+
+    - name: check if key exists
+      local_action:
+        module: stat
+        path: "{{ playbook_dir }}/vars/keys/{{ item }}.json"
+      register: _iroha2_init_key_stat
+
+    - block:
+
+        - name: generate initial keys
+          docker_container:
+            detach: false
+            image: "{{ iroha2_init_keygen_image_name }}:{{ iroha2_init_keygen_image_version }}"
+            name: "iroha_crypto_cli"
+            command: "./iroha_crypto_cli --json"
+            pull: true
+            cleanup: true
+          register: iroha_crypto_cli_output
+
+        - name: show generated keys
+          debug:
+            msg: "{{ iroha_crypto_cli_output.container.Output }}"
+
+        - name: filter output
+          set_fact:
+            _iroha2_init_keys_pair: "{{ iroha_crypto_cli_output.container.Output | from_json }}"
+
+        - name: check key format
+          fail:
+            msg: "`public_key` or `private_key` attribute not found in key pair"
+          when: >-
+            'public_key' not in _iroha2_init_keys_pair.keys() or
+            'private_key' not in _iroha2_init_keys_pair.keys()
+
+        - name: save key pair
+          local_action:
+            module: copy
+            content: "{{ _iroha2_init_keys_pair | to_nice_json }}"
+            dest: "{{ playbook_dir }}/vars/keys/{{ item }}.json"
+
+        - name: encrypt key pair
+          local_action:
+            module: ansible.builtin.command
+            cmd: "ansible-vault encrypt --vault-password-file='{{ iroha2_init_keys_ansible_encrypt_password_file }}' {{ playbook_dir }}/vars/keys/{{ item }}.json"
+          register: ret 
+          failed_when:    
+            - ret.rc != 0
+            - '"ERROR! input is already encrypted" not in ret.stderr'
+          changed_when: ret.rc == 0
+          when: iroha2_init_keys_ansible_encrypt_enable
+
+      when: not _iroha2_init_key_stat.stat.exists or iroha2_init_force_recreate
+
+  when: ansible_limit is not defined and not ansible_check_mode
+  tags: ["iroha2-init", "iroha2-init_keys"]

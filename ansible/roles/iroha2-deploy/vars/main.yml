@@ -1,0 +1,2 @@
+_iroha2_deploy_container_name: "iroha2"
+_iroha2_deploy_dir: "/opt/iroha2-deploy"

@@ -1,0 +1,114 @@
+#docker-compose variables
+iroha2_deploy_image: "hyperledger/iroha2"
+iroha2_deploy_version: "dev"
+
+iroha2_deploy_container_name: "{{ _iroha2_deploy_container_name }}"
+iroha2_deploy_dir: "{{ _iroha2_deploy_dir }}"
+
+iroha2_deploy_config_path: "/config"
+iroha2_deploy_local_config_path: "/opt/iroha2-deploy/configs/peer"
+
+iroha2_deploy_genesis_url: "https://raw.githubusercontent.com/hyperledger/iroha/iroha2-dev/configs/peer/genesis.json"
+iroha2_deploy_validator_wasm_url: "https://github.com/hyperledger/iroha/raw/iroha2-dev/configs/peer/validator.wasm"
+
+iroha2_deploy_torii_base_port: ""
+iroha2_deploy_http_base_port: ""
+
+iroha2_deploy_cpu_limit: ""
+iroha2_deploy_mem_limit: "14g"
+iroha2_deploy_docker_labels: {}
+iroha2_deploy_docker_labels_default: {}
+iroha2_deploy_docker_extra_networks: []
+iroha2_deploy_docker_network: "iroha2-net"
+iroha2_deploy_expose_ports: true
+iroha2_deploy_http_status_port: 8180
+iroha2_deploy_healthcheck_command: >-
+  if [ `curl -X GET http://127.0.0.1:8180/status/blocks` -le 0 ]; then exit 1; fi
+
+#KURA configuration
+iroha2_deploy_kura_path: "/storage"
+iroha2_deploy_local_kura_path: "/opt/docker_data/storage"
+iroha2_deploy_kura_blocks_per_storage: "1000"
+iroha2_deploy_kura_actor_channel_capacity: "100"
+
+#SUMERAGI configuration
+iroha2_deploy_sumeragi_block_time: "2000"
+iroha2_deploy_commit_time_ms: 4000
+iroha2_deploy_sumeragi_max_block_transactions: "512"
+iroha2_deploy_sumeragi_actor_channel_capacity: "100"
+iroha2_deploy_sumeragi_gossip_batch_size: "500"
+iroha2_deploy_sumeragi_gossip_period: "1000"
+
+#TORII configrutation
+iroha2_deploy_torii_port: "{{ iroha2_deploy_torii_base_port }}"
+iroha2_deploy_http_port: "{{ iroha2_deploy_http_base_port }}"
+iroha2_deploy_torii_telemetry_url: "0.0.0.0:8180"
+iroha2_deploy_torii_max_transaction_size: "32768"
+iroha2_deploy_torii_max_content_length: "16384000"
+
+#BLOCK_SYNC configrutation
+iroha2_deploy_block_sync_gossip_period_ms: "10000"
+iroha2_deploy_block_sync_batch_size: "4"
+iroha2_deploy_block_sync_actor_channel_capacity: "100"
+
+#QUEUE configrutation
+iroha2_deploy_queue_max_queue_transactions: "65536"
+iroha2_deploy_queue_max_per_user_transactions: "65536"
+iroha2_deploy_queue_time_live_transactions: "86400000"
+iroha2_deploy_queue_future_threshold: "1000"
+
+#LOGGER configuration
+iroha2_deploy_logger_log_level: "INFO"
+iroha2_deploy_logger_telemetry_capacity: "1000"
+
+#WSV configuration
+iroha2_deploy_wsv_asset_metadata_limits_max_len: "1048576"
+iroha2_deploy_wsv_asset_metadata_limits_max_entry: "4096"
+iroha2_deploy_wsv_asset_definition_max_len: "1048576"
+iroha2_deploy_wsv_asset_definition_max_enry: "4096"
+iroha2_deploy_wsv_account_metadata_max_len: "1048576"
+iroha2_deploy_wsv_account_metadata_max_entry: "4096"
+iroha2_deploy_wsv_domain_metadata_max_len: "1048576"
+iroha2_deploy_wsv_domain_metadata_max_entry: "4096"
+iroha2_deploy_wsv_ident_length_min: "1"
+iroha2_deploy_wsv_ident_length_max: "128"
+iroha2_deploy_wsv_transactions_limits_max_instruction_number: "4096"
+iroha2_deploy_wsv_transactions_limits_max_wasm_size: "4194304"
+iroha2_deploy_wsv_wasm_runtime_fuel: "1000000"
+iroha2_deploy_wsv_wasm_runtime_max_memory: "524288000"
+
+#NETWORK configuration
+iroha2_deploy_network_actor_channel_capacity: "100"
+
+#TELEMETRY configuration
+iroha2_deploy_telemetry_url: "ws://127.0.0.1:8081/submit"
+iroha2_deploy_telemetry_min_retry: "1"
+iroha2_deploy_telemetry_max_retry: "4"
+
+#KEYS management
+iroha2_deploy_genesis_key_pair: >-
+  {{ lookup('file',
+    '/vars/genesis-keys.json'
+  ) | from_json }}
+
+iroha2_deploy_key_pair: >-
+  {{ lookup('file',
+    '/vars/keys/' + iroha2_deploy_domain_name + ':' + (iroha2_deploy_torii_port | string) + '.json'
+  ) | from_json }}
+
+iroha2_deploy_config_key_pair: >-
+  {{ lookup('file',
+    '/vars/iroha2_deploy_config_key_pair.json'
+  ) | from_json }}
+
+iroha2_deploy_trusted_peers: >-
+  {{ lookup('file',
+    '/vars/trusted-peers.json'
+  ) | from_json }}
+
+#EXTRA variables
+# DANGER!!! this will clean the database
+iroha2_deploy_clean_blockstore: true
+iroha2_deploy_domain_name: "" # Required
+iroha2_deploy_submit_genesis: false
+iroha2_deploy_peer_count: 1

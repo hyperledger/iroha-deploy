@@ -1,0 +1,12 @@
+- name: create keys directory
+  local_action:
+    module: file
+    path: "{{ playbook_dir }}/vars/keys"
+    state: directory
+  tags: ["iroha2-init", "iroha2-init_keys"]
+
+- name: generate keys for all peers
+  include_tasks: single-key.yml
+  loop: "{{ _iroha2_init_peer_domains }}"
+  when: ansible_limit is not defined
+  tags: ["iroha2-init", "iroha2-init_keys"]

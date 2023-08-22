@@ -1,0 +1,36 @@
+- block:
+
+    - name: create keys directory
+      local_action:
+        module: file
+        path: "{{ playbook_dir }}/vars"
+        state: directory
+
+    - name: prepare all peer domains
+      set_fact:
+        _iroha2_init_peer_domains: >-
+          {%- set output = [] -%}
+          {%- for domain in iroha2_init_domains -%}
+            {% set peer_count = (domain['count'] | default(1)) %}
+            {%- for peer_index in range(peer_count) -%}
+              {{ output.append(
+                 '%s:%d' | format(domain['domain'], iroha2_init_torii_port + peer_index)
+              ) }}
+            {%- endfor -%}
+          {%- endfor -%}
+          {{ output }}
+
+    - name: print all iroha peer domains
+      debug:
+        msg: "{{ _iroha2_init_peer_domains }}"
+
+    - name: generate peer keys
+      import_tasks: keys.yml
+
+    - name: generate trusted peers
+      import_tasks: trusted-peers.yml
+
+  run_once: true
+  become: false
+  delegate_to: "localhost"
+  tags: ["iroha2-init"]

@@ -1,0 +1,18 @@
+[
+  {
+    "address": "s1.tst.iroha2.iroha.tech:1337",
+    "public_key": "ed01201c61faf8fe94e253b93114240394f79a607b7fa55f9e5a41ebec74b88055768b"
+  },
+  {
+    "address": "s2.tst.iroha2.iroha.tech:1337",
+    "public_key": "ed0120cc25624d62896d3a0bfd8940f928dc2abf27cc57cefeb442aa96d9081aae58a1"
+  },
+  {
+    "address": "s3.tst.iroha2.iroha.tech:1337",
+    "public_key": "ed0120faca9e8aa83225cb4d16d67f27dd4f93fc30ffa11adc1f5c88fd5495ecc91020"
+  },
+  {
+    "address": "s4.tst.iroha2.iroha.tech:1337",
+    "public_key": "ed01208e351a70b6a603ed285d666b8d689b680865913ba03ce29fb7d13a166c4e7f1f"
+  }
+]

@@ -1,0 +1,66 @@
+- block:
+    - name: deploy | create directories
+      file:
+        path: "{{ item }}"
+        mode: "777"
+        owner: "root"
+        group: "root"
+        state: directory
+      loop:
+        - "{{ iroha2_deploy_dir }}"
+        - "{{ iroha2_deploy_local_kura_path }}"
+        - "{{ iroha2_deploy_local_config_path  }}"
+
+    - name: deploy | copy genesis to the first peer
+      get_url:
+        url: "{{ iroha2_deploy_genesis_url }}"
+        dest: "{{ iroha2_deploy_local_config_path }}/{{ item.dst_path }}/{{ item.dst }}"
+        mode: "{{ item.mode | default('755') }}"
+        owner: "{{ item.owner | default('root') }}"
+        group: "{{ item.group | default('root') }}"
+        force: yes
+      loop:
+        - { dst: "genesis.json", dst_path: "." }
+
+    - name: deploy | copy validator.wasm file to peers
+      get_url:
+        url: "{{ iroha2_deploy_validator_wasm_url }}"
+        dest: "{{ iroha2_deploy_local_config_path }}/{{ item.dst_path }}/{{ item.dst }}"
+        mode: "{{ item.mode | default('755') }}"
+        owner: "{{ item.owner | default('root') }}"
+        group: "{{ item.group | default('root') }}"
+        force: yes
+      loop:
+        - { dst: "validator.wasm", dst_path: "." }
+
+    - name: deploy | copy initial config
+      template:
+        src: "{{ item.dst }}.j2"
+        dest: "{{ iroha2_deploy_local_config_path }}/{{ item.dst_path }}/{{ item.dst }}"
+        mode: "{{ item.mode | default('755') }}"
+        owner: "{{ item.owner | default('root') }}"
+        group: "{{ item.group | default('root') }}"
+      loop:
+        - { dst: "config.json", dst_path: "." }
+
+    - name: deploy | copy compose template
+      template:
+        src: "{{ item.dst }}.j2"
+        dest: "{{ iroha2_deploy_dir }}/{{ item.dst_path }}/{{ item.dst }}"
+        mode: "{{ item.mode | default('600') }}"
+        owner: "{{ item.owner | default('root') }}"
+        group: "{{ item.group | default('root') }}"
+      loop:
+        - { dst: "docker-compose.yml", dst_path: "." }
+
+    - name: deploy | flush handlers before service start
+      meta: flush_handlers
+
+    - name: deploy | start services
+      docker_compose:
+        project_src: "{{ iroha2_deploy_dir }}"
+        files: [docker-compose.yml]
+        pull: yes
+        state: present
+
+  tags: ["iroha2-deploy", "iroha2-deploy_deploy"]

@@ -1,0 +1,8 @@
+---
+- name: restart iroha2_deploy
+  docker_compose:
+    project_src: "{{ iroha2_deploy_dir }}"
+    files: [docker-compose.yml]
+    state: present
+    recreate: always
+  tags: ["iroha2-deploy"]
