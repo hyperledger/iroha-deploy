@@ -18,7 +18,7 @@
 
 - name: Print variables from 'iroha_peer_keys.yml' file
   debug:
-   var: iroha_peer_keys_from_file
+    var: iroha_peer_keys_from_file
   when: iroha_peer_keys_from_file is defined
   run_once: yes
   tags: [ "never"]
